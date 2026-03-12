@@ -630,9 +630,10 @@ hr {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
-  max-width: var(--container-max);
-  margin: 0 auto;
-  padding: var(--space-7) var(--space-6) var(--space-10);
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 0 var(--space-10);
 }
 
 .topbar {
@@ -641,7 +642,7 @@ hr {
   z-index: 200;
   background: color-mix(in srgb, var(--surface) 88%, transparent);
   border: var(--panel-border-width) var(--panel-border-style) var(--border);
-  border-radius: var(--panel-radius);
+  border-radius: 0;
   box-shadow: var(--panel-shadow);
   background-image: var(--surface-texture);
   backdrop-filter: blur(14px) saturate(1.2);
@@ -652,8 +653,8 @@ hr {
   grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
   gap: var(--space-4);
   align-items: center;
-  padding: var(--space-4) var(--space-5);
-  max-width: var(--content-max);
+  padding: var(--space-4) var(--space-6);
+  max-width: var(--container-max);
   margin: 0 auto;
 }
 
@@ -686,6 +687,7 @@ hr {
   gap: var(--space-6);
   min-width: 0;
   align-items: center;
+  padding: var(--space-6) var(--space-6) 0;
 }
 
 .main > * {
@@ -1700,10 +1702,6 @@ html[data-layout='flow'] .meta-panel {
 }
 
 @media screen and (max-width: 1100px) {
-  .app-shell {
-    padding: var(--space-6);
-  }
-
   .topbar-content {
     grid-template-columns: 1fr;
     justify-items: start;
@@ -1717,19 +1715,27 @@ html[data-layout='flow'] .meta-panel {
     justify-self: stretch;
     width: 100%;
   }
+
+  .main {
+    padding: var(--space-5) var(--space-5) 0;
+  }
 }
 
 @media screen and (max-width: 720px) {
-  .app-shell {
-    padding: var(--space-5);
-  }
-
   .search-form-inline {
     width: 100%;
   }
 
   .search-form-inline .search-input-wrap {
     width: 100%;
+  }
+
+  .topbar-content {
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .main {
+    padding: var(--space-4) var(--space-4) 0;
   }
 
   .profile-head {
