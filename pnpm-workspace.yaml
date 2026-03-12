@@ -6,3 +6,6 @@ onlyBuiltDependencies:
   - sharp
   - simple-git-hooks
   - workerd
+
+patchedDependencies:
+  vite: patches/vite.patch

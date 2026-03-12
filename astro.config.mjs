@@ -27,6 +27,7 @@ const providers = {
 const adapterProvider = (process.env.HOME === '/dev/shm/home' && process.env.TMPDIR === '/dev/shm/tmp')
   ? 'edgeone'
   : process.env.SERVER_ADAPTER || provider
+const disableOptimizeDeps = process.env.NO_OPTIMIZE_DEPS === 'true'
 
 // https://astro.build/config
 export default defineConfig({
@@ -51,6 +52,14 @@ export default defineConfig({
       : []),
   ],
   vite: {
+    ...(disableOptimizeDeps
+      ? {
+          optimizeDeps: {
+            noDiscovery: true,
+            include: [],
+          },
+        }
+      : {}),
     ssr: {
       noExternal: process.env.DOCKER ? !!process.env.DOCKER : undefined,
       external: [
