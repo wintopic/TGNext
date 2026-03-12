@@ -107,13 +107,13 @@ html[data-theme='mono'][data-mode='light'] {
   --bg-glow: none;
   --page-texture: none;
   --surface-texture: none;
-  --glass-bg: color-mix(in srgb, var(--surface) 58%, transparent);
-  --glass-border: color-mix(in srgb, var(--border) 55%, transparent);
-  --glass-shadow: 0 18px 40px rgba(0, 0, 0, 0.1);
-  --glass-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.65), inset 0 -1px 0 rgba(255, 255, 255, 0.25);
-  --glass-highlight: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.35) 45%, rgba(255, 255, 255, 0.12));
-  --glass-glow: rgba(255, 255, 255, 0.4);
-  --glass-glow-soft: rgba(255, 255, 255, 0.28);
+  --glass-bg: color-mix(in srgb, var(--surface) 42%, transparent);
+  --glass-border: color-mix(in srgb, var(--border) 38%, transparent);
+  --glass-shadow: 0 22px 44px rgba(0, 0, 0, 0.08);
+  --glass-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.75), inset 0 -1px 0 rgba(255, 255, 255, 0.35);
+  --glass-highlight: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.45) 45%, rgba(255, 255, 255, 0.18));
+  --glass-glow: rgba(255, 255, 255, 0.55);
+  --glass-glow-soft: rgba(255, 255, 255, 0.35);
   --glass-radius: 22px;
   --nav-width: 240px;
   --side-width: 320px;
@@ -159,13 +159,13 @@ html[data-theme='mono'][data-mode='dark'] {
   --bg-glow: none;
   --page-texture: none;
   --surface-texture: none;
-  --glass-bg: color-mix(in srgb, var(--surface) 52%, transparent);
-  --glass-border: color-mix(in srgb, var(--border) 60%, transparent);
-  --glass-shadow: 0 22px 46px rgba(0, 0, 0, 0.6);
-  --glass-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 rgba(255, 255, 255, 0.04);
-  --glass-highlight: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08) 45%, rgba(255, 255, 255, 0));
-  --glass-glow: rgba(255, 255, 255, 0.18);
-  --glass-glow-soft: rgba(255, 255, 255, 0.12);
+  --glass-bg: color-mix(in srgb, var(--surface) 36%, transparent);
+  --glass-border: color-mix(in srgb, var(--border) 45%, transparent);
+  --glass-shadow: 0 26px 52px rgba(0, 0, 0, 0.65);
+  --glass-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+  --glass-highlight: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.12) 45%, rgba(255, 255, 255, 0));
+  --glass-glow: rgba(255, 255, 255, 0.28);
+  --glass-glow-soft: rgba(255, 255, 255, 0.18);
   --glass-radius: 22px;
   --nav-width: 240px;
   --side-width: 320px;
@@ -221,10 +221,11 @@ html[data-tabbar='true'] .app-shell {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow), var(--glass-shadow-inset);
-  backdrop-filter: blur(26px) saturate(1.6);
+  backdrop-filter: blur(32px) saturate(1.85);
   background-image:
     var(--glass-highlight),
-    radial-gradient(140px 60px at 20% 0%, var(--glass-glow), transparent 70%);
+    radial-gradient(160px 70px at 18% -10%, var(--glass-glow), transparent 72%),
+    radial-gradient(140px 60px at 92% 0%, var(--glass-glow-soft), transparent 70%);
   border-radius: var(--glass-radius);
 }
 
@@ -613,13 +614,14 @@ html[data-tabbar='true'] .app-shell {
 }
 
 .glass-panel {
-  background: color-mix(in srgb, var(--glass-bg) 88%, var(--surface) 12%);
+  background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow), var(--glass-shadow-inset);
-  backdrop-filter: blur(26px) saturate(1.6);
+  backdrop-filter: blur(32px) saturate(1.85);
   background-image:
     var(--glass-highlight),
-    radial-gradient(180px 80px at 15% 0%, var(--glass-glow-soft), transparent 70%);
+    radial-gradient(200px 90px at 12% -10%, var(--glass-glow-soft), transparent 72%),
+    radial-gradient(160px 70px at 88% 0%, var(--glass-glow), transparent 70%);
   border-radius: var(--glass-radius);
 }
 
