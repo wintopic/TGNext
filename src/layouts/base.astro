@@ -93,7 +93,7 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
 ---
 
 <!doctype html>
-<html lang={locale} data-theme="x" data-mode="light" data-mode-preference="system" data-layout="flow">
+<html lang={locale} data-theme="x" data-mode="light" data-mode-preference="system" data-layout="card">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -108,12 +108,12 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
       ;(() => {
         const doc = document.documentElement
         const allowedThemes = ['x', 'anzhiyu', 'endfield', 'discourse', 'obsidian']
-        const allowedLayouts = ['flow', 'normal']
+        const allowedLayouts = ['card', 'grid', 'masonry']
         const storedThemeRaw = localStorage.getItem('tgnext-theme')
         const storedTheme = allowedThemes.includes(storedThemeRaw) ? storedThemeRaw : 'x'
         const storedMode = localStorage.getItem('tgnext-mode') || 'system'
         const storedLayoutRaw = localStorage.getItem('tgnext-layout')
-        const storedLayout = allowedLayouts.includes(storedLayoutRaw) ? storedLayoutRaw : 'flow'
+        const storedLayout = allowedLayouts.includes(storedLayoutRaw) ? storedLayoutRaw : 'card'
         const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
         const resolvedMode = storedMode === 'system' ? (systemDark ? 'dark' : 'light') : storedMode
 
