@@ -1221,6 +1221,7 @@ html[data-layout='grid'] .item {
 }
 
 html[data-layout='masonry'] .items {
+  display: block;
   column-count: 2;
   column-gap: var(--space-5);
 }
