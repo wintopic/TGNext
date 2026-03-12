@@ -131,16 +131,16 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
 
   <body id="top">
     <div class="app-shell">
-      <aside class="sidebar">
-        <div class="sidebar-head">
+      <header class="topbar">
+        <div class="topbar-left">
           <a class="brand" href={SITE_URL} title="TGNext">
             TGNext
           </a>
           <div class="brand-subtitle">{channel?.title}</div>
         </div>
 
-        <div class="sidebar-block">
-          <div class="nav">
+        <div class="topbar-actions">
+          <nav class="topbar-nav" aria-label="Primary">
             <a href={SITE_URL} title={labels.home} class={`nav-link ${pathname === '/' ? 'current' : ''}`}>
               {labels.home}
             </a>
@@ -168,11 +168,9 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
                 </a>
               ))
             }
-          </div>
-        </div>
+          </nav>
 
-        <div class="sidebar-block">
-          <form class="search-form" action={searchAction} method="get">
+          <form class="search-form search-form-inline" action={searchAction} method="get">
             {GOOGLE_SEARCH_SITE ? <input type="hidden" name="as_sitesearch" value={GOOGLE_SEARCH_SITE} /> : null}
             <label class="search-label" for="search-input">{labels.search}</label>
             <div class="search-input-wrap">
@@ -192,67 +190,71 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
             </div>
           </form>
         </div>
+      </header>
 
-        {
-          tags.length > 0 && (
-            <div class="sidebar-block">
-              <div class="block-title">{labels.tags}</div>
-              <div class="tag-list">
-                {tags.map(tag => (
-                  <a
-                    href={`/search/%23${tag}`}
-                    class={`tag-chip ${currentTag === tag ? 'active' : ''}`}
-                    title={tag}
-                  >
-                    #{tag}
-                  </a>
-                ))}
+      <div class="content-grid">
+        <main class="main">
+          <slot />
+        </main>
+
+        <aside class="sidebar">
+          {
+            tags.length > 0 && (
+              <div class="sidebar-block">
+                <div class="block-title">{labels.tags}</div>
+                <div class="tag-list">
+                  {tags.map(tag => (
+                    <a
+                      href={`/search/%23${tag}`}
+                      class={`tag-chip ${currentTag === tag ? 'active' : ''}`}
+                      title={tag}
+                    >
+                      #{tag}
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
-          )
-        }
+            )
+          }
 
-        {
-          links.length > 0 && (
-            <div class="sidebar-block">
-              <div class="block-title">{labels.links}</div>
-              <div class="link-list">
-                {links.map(link => (
-                  <a href={link.href} class="link-chip" target="_blank" rel="noopener" title={link.title}>
-                    {link.title}
-                  </a>
-                ))}
+          {
+            links.length > 0 && (
+              <div class="sidebar-block">
+                <div class="block-title">{labels.links}</div>
+                <div class="link-list">
+                  {links.map(link => (
+                    <a href={link.href} class="link-chip" target="_blank" rel="noopener" title={link.title}>
+                      {link.title}
+                    </a>
+                  ))}
+                </div>
               </div>
+            )
+          }
+
+          <div class="sidebar-block">
+            <div class="block-title">{labels.theme}</div>
+            <div class="theme-switch">
+              <button class="switch-chip" type="button" data-theme-value="sepia" aria-pressed="false">Sepia</button>
+              <button class="switch-chip" type="button" data-theme-value="minimal" aria-pressed="false">Minimal</button>
+              <button class="switch-chip" type="button" data-theme-value="bold" aria-pressed="false">Bold</button>
             </div>
-          )
-        }
-
-        <div class="sidebar-block">
-          <div class="block-title">{labels.theme}</div>
-          <div class="theme-switch">
-            <button class="switch-chip" type="button" data-theme-value="sepia" aria-pressed="false">Sepia</button>
-            <button class="switch-chip" type="button" data-theme-value="minimal" aria-pressed="false">Minimal</button>
-            <button class="switch-chip" type="button" data-theme-value="bold" aria-pressed="false">Bold</button>
+            <div class="block-title">{labels.mode}</div>
+            <div class="theme-switch">
+              <button class="switch-chip" type="button" data-mode-value="light" aria-pressed="false">{labels.light}</button>
+              <button class="switch-chip" type="button" data-mode-value="dark" aria-pressed="false">{labels.dark}</button>
+              <button class="switch-chip" type="button" data-mode-value="system" aria-pressed="false">{labels.system}</button>
+            </div>
           </div>
-          <div class="block-title">{labels.mode}</div>
-          <div class="theme-switch">
-            <button class="switch-chip" type="button" data-mode-value="light" aria-pressed="false">{labels.light}</button>
-            <button class="switch-chip" type="button" data-mode-value="dark" aria-pressed="false">{labels.dark}</button>
-            <button class="switch-chip" type="button" data-mode-value="system" aria-pressed="false">{labels.system}</button>
+
+          <div class="sidebar-footer">
+            <span>Powered by</span>
+            <a href="https://github.com/wintopic/TGNext" target="_blank" rel="noopener">TGNext</a>
+            <span>·</span>
+            <a href="https://github.com/Planetable/SiteTemplateSepia" target="_blank" rel="noopener">Sepia</a>
           </div>
-        </div>
-
-        <div class="sidebar-footer">
-          <span>Powered by</span>
-          <a href="https://github.com/wintopic/TGNext" target="_blank" rel="noopener">TGNext</a>
-          <span>·</span>
-          <a href="https://github.com/Planetable/SiteTemplateSepia" target="_blank" rel="noopener">Sepia</a>
-        </div>
-      </aside>
-
-      <main class="main">
-        <slot />
-      </main>
+        </aside>
+      </div>
     </div>
 
     <a href="#top" id="back-to-top" aria-label="Back to top">
