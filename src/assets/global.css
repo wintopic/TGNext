@@ -25,16 +25,18 @@ mark {
   right: 24px;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: var(--chip-radius);
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-1);
+  border: var(--panel-border-width) var(--panel-border-style) var(--border);
+  box-shadow: var(--panel-shadow);
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
   z-index: 1000;
 }
 

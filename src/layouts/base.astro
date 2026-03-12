@@ -61,7 +61,7 @@ const LINKS = getEnv(import.meta.env, Astro, 'LINKS')
 
 const tags = (TAGS || '')
   .split(',')
-  .map(tag => tag.trim())
+  .map((tag) => tag.trim())
   .filter(Boolean)
 
 const links = (LINKS || '')
@@ -105,7 +105,7 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
       }
     </style>
     <script is:inline>
-      (() => {
+      ;(() => {
         const doc = document.documentElement
         const storedTheme = localStorage.getItem('tgnext-theme') || 'sepia'
         const storedMode = localStorage.getItem('tgnext-mode') || 'system'
@@ -133,9 +133,7 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
     <div class="app-shell">
       <header class="topbar">
         <div class="topbar-left">
-          <a class="brand" href={SITE_URL} title="TGNext">
-            TGNext
-          </a>
+          <a class="brand" href={SITE_URL} title="TGNext"> TGNext </a>
           <div class="brand-subtitle">{channel?.title}</div>
         </div>
 
@@ -146,19 +144,31 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
             </a>
             {
               TAGS ? (
-                <a href={`${SITE_URL}tags`} title={labels.tags} class={`nav-link ${pathname === '/tags' ? 'current' : ''}`}>
+                <a
+                  href={`${SITE_URL}tags`}
+                  title={labels.tags}
+                  class={`nav-link ${pathname === '/tags' ? 'current' : ''}`}
+                >
                   {labels.tags}
                 </a>
               ) : null
             }
             {
               LINKS ? (
-                <a href={`${SITE_URL}links`} title={labels.links} class={`nav-link ${pathname === '/links' ? 'current' : ''}`}>
+                <a
+                  href={`${SITE_URL}links`}
+                  title={labels.links}
+                  class={`nav-link ${pathname === '/links' ? 'current' : ''}`}
+                >
                   {labels.links}
                 </a>
               ) : null
             }
-            <a href={`${SITE_URL}settings`} title={labels.settings} class={`nav-link ${pathname === '/settings' ? 'current' : ''}`}>
+            <a
+              href={`${SITE_URL}settings`}
+              title={labels.settings}
+              class={`nav-link ${pathname === '/settings' ? 'current' : ''}`}
+            >
               {labels.settings}
             </a>
             {
@@ -174,7 +184,13 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
             {GOOGLE_SEARCH_SITE ? <input type="hidden" name="as_sitesearch" value={GOOGLE_SEARCH_SITE} /> : null}
             <label class="search-label" for="search-input">{labels.search}</label>
             <div class="search-input-wrap">
-              <input id="search-input" type="text" name="q" placeholder={labels.searchPlaceholder} defaultValue={currentQuery} />
+              <input
+                id="search-input"
+                type="text"
+                name="q"
+                placeholder={labels.searchPlaceholder}
+                defaultValue={currentQuery}
+              />
               <button type="submit" class="icon-button" aria-label={labels.search}>
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path
@@ -183,8 +199,7 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
                     stroke="currentColor"
                     stroke-width="1.6"
                     stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
+                    stroke-linejoin="round"></path>
                 </svg>
               </button>
             </div>
@@ -203,12 +218,8 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
               <div class="sidebar-block">
                 <div class="block-title">{labels.tags}</div>
                 <div class="tag-list">
-                  {tags.map(tag => (
-                    <a
-                      href={`/search/%23${tag}`}
-                      class={`tag-chip ${currentTag === tag ? 'active' : ''}`}
-                      title={tag}
-                    >
+                  {tags.map((tag) => (
+                    <a href={`/search/%23${tag}`} class={`tag-chip ${currentTag === tag ? 'active' : ''}`} title={tag}>
                       #{tag}
                     </a>
                   ))}
@@ -222,7 +233,7 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
               <div class="sidebar-block">
                 <div class="block-title">{labels.links}</div>
                 <div class="link-list">
-                  {links.map(link => (
+                  {links.map((link) => (
                     <a href={link.href} class="link-chip" target="_blank" rel="noopener" title={link.title}>
                       {link.title}
                     </a>
@@ -241,9 +252,15 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
             </div>
             <div class="block-title">{labels.mode}</div>
             <div class="theme-switch">
-              <button class="switch-chip" type="button" data-mode-value="light" aria-pressed="false">{labels.light}</button>
-              <button class="switch-chip" type="button" data-mode-value="dark" aria-pressed="false">{labels.dark}</button>
-              <button class="switch-chip" type="button" data-mode-value="system" aria-pressed="false">{labels.system}</button>
+              <button class="switch-chip" type="button" data-mode-value="light" aria-pressed="false"
+                >{labels.light}</button
+              >
+              <button class="switch-chip" type="button" data-mode-value="dark" aria-pressed="false"
+                >{labels.dark}</button
+              >
+              <button class="switch-chip" type="button" data-mode-value="system" aria-pressed="false"
+                >{labels.system}</button
+              >
             </div>
           </div>
 
@@ -263,15 +280,14 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
     <Fragment set:html={FOOTER_INJECT} />
 
     <script is:inline>
-      (() => {
+      ;(() => {
         const doc = document.documentElement
         const themeButtons = document.querySelectorAll('[data-theme-value]')
         const modeButtons = document.querySelectorAll('[data-mode-value]')
         const media = window.matchMedia('(prefers-color-scheme: dark)')
 
         function resolveMode(modePreference) {
-          if (modePreference === 'system')
-            return media.matches ? 'dark' : 'light'
+          if (modePreference === 'system') return media.matches ? 'dark' : 'light'
           return modePreference
         }
 
@@ -315,8 +331,9 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
         })
 
         media.addEventListener('change', (event) => {
-          if ((doc.dataset.modePreference || 'system') === 'system')
+          if ((doc.dataset.modePreference || 'system') === 'system') {
             doc.dataset.mode = event.matches ? 'dark' : 'light'
+          }
         })
 
         updateButtons()
