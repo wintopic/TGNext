@@ -107,13 +107,13 @@ html[data-theme='mono'][data-mode='light'] {
   --bg-glow: none;
   --page-texture: none;
   --surface-texture: none;
-  --glass-bg: color-mix(in srgb, var(--surface) 42%, transparent);
-  --glass-border: color-mix(in srgb, var(--border) 38%, transparent);
-  --glass-shadow: 0 22px 44px rgba(0, 0, 0, 0.08);
-  --glass-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.75), inset 0 -1px 0 rgba(255, 255, 255, 0.35);
-  --glass-highlight: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.45) 45%, rgba(255, 255, 255, 0.18));
-  --glass-glow: rgba(255, 255, 255, 0.55);
-  --glass-glow-soft: rgba(255, 255, 255, 0.35);
+  --glass-bg: color-mix(in srgb, var(--surface) 28%, transparent);
+  --glass-border: color-mix(in srgb, var(--border) 26%, transparent);
+  --glass-shadow: 0 26px 54px rgba(0, 0, 0, 0.08);
+  --glass-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.85), inset 0 -1px 0 rgba(255, 255, 255, 0.45);
+  --glass-highlight: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.6) 40%, rgba(255, 255, 255, 0.22));
+  --glass-glow: rgba(255, 255, 255, 0.75);
+  --glass-glow-soft: rgba(255, 255, 255, 0.48);
   --glass-radius: 22px;
   --nav-width: 240px;
   --side-width: 320px;
@@ -159,13 +159,13 @@ html[data-theme='mono'][data-mode='dark'] {
   --bg-glow: none;
   --page-texture: none;
   --surface-texture: none;
-  --glass-bg: color-mix(in srgb, var(--surface) 36%, transparent);
-  --glass-border: color-mix(in srgb, var(--border) 45%, transparent);
-  --glass-shadow: 0 26px 52px rgba(0, 0, 0, 0.65);
-  --glass-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(255, 255, 255, 0.06);
-  --glass-highlight: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.12) 45%, rgba(255, 255, 255, 0));
-  --glass-glow: rgba(255, 255, 255, 0.28);
-  --glass-glow-soft: rgba(255, 255, 255, 0.18);
+  --glass-bg: color-mix(in srgb, var(--surface) 22%, transparent);
+  --glass-border: color-mix(in srgb, var(--border) 30%, transparent);
+  --glass-shadow: 0 30px 64px rgba(0, 0, 0, 0.7);
+  --glass-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.24), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+  --glass-highlight: linear-gradient(135deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.18) 40%, rgba(255, 255, 255, 0));
+  --glass-glow: rgba(255, 255, 255, 0.4);
+  --glass-glow-soft: rgba(255, 255, 255, 0.26);
   --glass-radius: 22px;
   --nav-width: 240px;
   --side-width: 320px;
@@ -221,11 +221,12 @@ html[data-tabbar='true'] .app-shell {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow), var(--glass-shadow-inset);
-  backdrop-filter: blur(32px) saturate(1.85);
+  backdrop-filter: blur(40px) saturate(2.2);
   background-image:
     var(--glass-highlight),
-    radial-gradient(160px 70px at 18% -10%, var(--glass-glow), transparent 72%),
-    radial-gradient(140px 60px at 92% 0%, var(--glass-glow-soft), transparent 70%);
+    radial-gradient(180px 80px at 16% -20%, var(--glass-glow), transparent 72%),
+    radial-gradient(160px 70px at 92% -10%, var(--glass-glow-soft), transparent 70%),
+    radial-gradient(120px 50px at 50% 120%, rgba(255, 255, 255, 0.18), transparent 70%);
   border-radius: var(--glass-radius);
 }
 
@@ -617,11 +618,12 @@ html[data-tabbar='true'] .app-shell {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow), var(--glass-shadow-inset);
-  backdrop-filter: blur(32px) saturate(1.85);
+  backdrop-filter: blur(40px) saturate(2.2);
   background-image:
     var(--glass-highlight),
-    radial-gradient(200px 90px at 12% -10%, var(--glass-glow-soft), transparent 72%),
-    radial-gradient(160px 70px at 88% 0%, var(--glass-glow), transparent 70%);
+    radial-gradient(220px 100px at 10% -20%, var(--glass-glow-soft), transparent 72%),
+    radial-gradient(180px 80px at 90% -10%, var(--glass-glow), transparent 70%),
+    radial-gradient(140px 60px at 50% 120%, rgba(255, 255, 255, 0.12), transparent 70%);
   border-radius: var(--glass-radius);
 }
 
