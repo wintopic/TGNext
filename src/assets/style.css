@@ -575,7 +575,6 @@ hr {
   letter-spacing: 0.12em;
 }
 
-
 .profile-actions {
   display: flex;
   flex-wrap: wrap;
@@ -617,7 +616,6 @@ hr {
   border-left-style: solid;
   border-left-width: calc(var(--card-border-width) + 2px);
 }
-
 
 .section-title {
   margin-top: var(--space-7);
@@ -723,7 +721,6 @@ hr {
   box-shadow: var(--panel-shadow);
   transform: translateY(-2px);
 }
-
 
 html[data-layout='card'] .main > * {
   max-width: min(760px, 100%);

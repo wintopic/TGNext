@@ -51,7 +51,9 @@ const saved = Astro.url.searchParams.get('saved') === '1'
         rows="4"
         placeholder={labels.keywordsPlaceholder}
         disabled={filterLocked}
-      >{filterSetting.value}</textarea>
+      >
+        {filterSetting.value}
+      </textarea>
       {filterLocked && <div class="form-hint">{labels.controlledByEnv}</div>}
       <div class="form-hint">{labels.keywordsHint}</div>
     </div>

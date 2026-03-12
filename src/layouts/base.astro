@@ -173,7 +173,14 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
             >
               {labels.settings}
             </a>
-            <a href={RSS_URL} title={labels.rss} class="nav-link" target="_blank" rel="alternate" type="application/rss+xml">
+            <a
+              href={RSS_URL}
+              title={labels.rss}
+              class="nav-link"
+              target="_blank"
+              rel="alternate"
+              type="application/rss+xml"
+            >
               RSS
             </a>
             {
@@ -262,8 +269,9 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
         const media = window.matchMedia('(prefers-color-scheme: dark)')
 
         function resolveMode(modePreference) {
-          if (modePreference === 'system') 
-return media.matches ? 'dark' : 'light'
+          if (modePreference === 'system') {
+            return media.matches ? 'dark' : 'light'
+          }
           return modePreference
         }
 
