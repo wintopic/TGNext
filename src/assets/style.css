@@ -636,11 +636,15 @@ hr {
 }
 
 .topbar {
-  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
   border: var(--panel-border-width) var(--panel-border-style) var(--border);
   border-radius: var(--panel-radius);
   box-shadow: var(--panel-shadow);
   background-image: var(--surface-texture);
+  backdrop-filter: blur(14px) saturate(1.2);
 }
 
 .topbar-content {
@@ -651,6 +655,12 @@ hr {
   padding: var(--space-4) var(--space-5);
   max-width: var(--content-max);
   margin: 0 auto;
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .topbar {
+    background: var(--surface);
+  }
 }
 
 .topbar-brand {

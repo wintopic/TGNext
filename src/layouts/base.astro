@@ -177,6 +177,9 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
             >
               {labels.settings}
             </a>
+            <a href={RSS_URL} title={labels.rss} class="nav-link" target="_blank" rel="alternate" type="application/rss+xml">
+              RSS
+            </a>
             {
               navs.map((nav) => (
                 <a href={nav.href} title={nav.title} target="_blank" rel="noopener" class="nav-link">
@@ -216,7 +219,7 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
       <main class="main">
         <slot name="header" />
 
-        {(tags.length > 0 || links.length > 0 || RSS_URL) && (
+        {(tags.length > 0 || links.length > 0) && (
           <div class="meta-panel">
             {tags.length > 0 && (
               <div class="meta-section">
@@ -243,15 +246,6 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
                 </div>
               </div>
             )}
-
-            <div class="meta-section">
-              <div class="block-title">{labels.rss}</div>
-              <div class="link-list">
-                <a href={RSS_URL} class="link-chip" target="_blank" rel="alternate" type="application/rss+xml">
-                  RSS
-                </a>
-              </div>
-            </div>
           </div>
         )}
 
