@@ -1,136 +1,153 @@
 # TGNext
 
-**将你的 Telegram Channel 转为微博客。**
-
----
+**把你的 Telegram Channel 变成轻量微博客。**
 
 简体中文 | [English](./README.en.md)
 
-## ✨ 特性
+---
 
-- **将 Telegram Channel 转为微博客**
-- **SEO 友好** `/sitemap.xml`
-- **浏览器端最小化 JS**（主题切换 + 可选高亮）
-- **提供 RSS 和 RSS JSON** `/rss.xml` `/rss.json`
-- **主题系统** 3 套主题 + 暗黑模式
-- **关键词过滤** 支持变量与设置页
+## 概览
 
-## 🪧 演示
+TGNext 是一个基于 Astro SSR 的轻量化站点生成器，直接把 Telegram 频道内容转成可订阅、可搜索、可标签化的微型博客站点。
 
-- 在 Cloudflare Pages、Netlify 或 Vercel 部署你自己的 TGNext。
+- Cloudflare Pages / Netlify / Vercel 可直接部署
+- 主题与暗黑模式内置，支持一键切换
+- 关键词过滤（变量优先）贯穿列表、详情、RSS、Sitemap
 
-### 平台
+---
 
-- Cloudflare Pages（推荐）
-- Netlify
-- Vercel
+## 功能亮点
 
-TGNext 支持部署在 Cloudflare、Netlify、Vercel 等支持 Node.js SSR 的无服务器平台或者 VPS。
-具体教程见[部署你的 Astro 站点](https://docs.astro.build/zh-cn/guides/deploy/)。
+- **Telegram 频道即 CMS**：无需后台，直接抓取频道内容
+- **SEO 友好**：`/sitemap.xml` + `noindex` 规则支持
+- **最小化 JS**：仅主题切换与可选高亮
+- **RSS 与 RSS JSON**：`/rss.xml` / `/rss.json`
+- **主题系统**：3 套主题 + 暗黑模式
+- **关键词过滤**：环境变量与设置页双通道
+- **搜索 / 标签 / 归档**：内置搜索页与标签聚合
 
-## 🧱 技术栈
+---
 
-- 框架：[Astro](https://astro.build/)
-- 内容管理系统：[Telegram Channels](https://telegram.org/tour/channels)
-- 模板: [Sepia](https://github.com/Planetable/SiteTemplateSepia)
+## 快速开始
 
-## 🙏 致谢
+1. 克隆仓库
+   - `git clone https://github.com/wintopic/TGNext.git`
+2. 安装依赖
+   - `pnpm install`
+3. 启动开发
+   - `pnpm dev`
+4. 打开浏览器
+   - `http://localhost:4321`
 
-TGNext 基于 [BroadcastChannel](https://github.com/miantiao-me/BroadcastChannel) 进行改造。
+---
 
-## 🏗️ 部署
+## 部署（Cloudflare Pages 推荐）
 
-### Docker
+### Cloudflare Pages
+
+1. 在 GitHub 上创建 TGNext 项目
+2. 在 Cloudflare Pages 新建项目，选择 `Astro`
+3. 配置环境变量 `CHANNEL`
+4. 保存并部署
+
+### Netlify / Vercel
+
+流程与 Cloudflare Pages 类似，选择 `Astro` 并配置 `CHANNEL` 即可。
+
+---
+
+## Docker
 
 1. `docker build -t tgnext .`
 2. `docker run -d --name tgnext -p 4321:4321 -e CHANNEL=your_channel tgnext`
 
-如果启用仓库内置的 GitHub Actions 工作流，镜像会发布到：
+如果启用仓库内置 GitHub Actions，镜像会发布到：
 `ghcr.io/<owner>/tgnext:main`
 
-### Serverless
+---
 
-1. 先 Fork 本项目到你的 GitHub（或作为模板使用）
-2. 在 Cloudflare/Netlify/Vercel 创建项目
-3. 选择 `TGNext` 项目和 `Astro` 框架
-4. 配置环境变量 `CHANNEL` 为你的频道名称。此为最小化配置，更多配置见下面的配置项
-5. 保存并部署
-6. 绑定域名（可选）。
-7. 更新代码，参考 GitHub 官方文档 [从 Web UI 同步分叉分支](https://docs.github.com/zh/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-web-ui)。
+## 配置
 
-## ⚒️ 配置
+将 `.env.example` 复制为 `.env`，至少需要配置 `CHANNEL`。
 
-```env
-## Telegram 频道用户名，必须配置。 t.me/ 后面那串字符
-CHANNEL=your_channel
+### 必填
 
-## 语言和时区设置，语言选项见[dayjs](https://github.com/iamkun/dayjs/tree/dev/src/locale)
-LOCALE=zh-cn
-TIMEZONE=Asia/Shanghai
+| 变量      | 说明                | 示例           |
+| --------- | ------------------- | -------------- |
+| `CHANNEL` | Telegram 频道用户名 | `your_channel` |
 
-## 社交媒体用户名
-TELEGRAM=your_telegram
-TWITTER=your_twitter
-GITHUB=your_github
+### 基础配置
 
-## 下面两个社交媒体需要为 URL
-DISCORD=https://DISCORD.com
-PODCAST=https://PODCAST.com
+| 变量       | 说明             | 默认/示例                   |
+| ---------- | ---------------- | --------------------------- |
+| `LOCALE`   | 语言             | `zh-cn`                     |
+| `TIMEZONE` | 时区             | `Asia/Shanghai`             |
+| `TELEGRAM` | Telegram 用户名  | `your_telegram`             |
+| `TWITTER`  | X/Twitter 用户名 | `your_twitter`              |
+| `GITHUB`   | GitHub 用户名    | `your_github`               |
+| `MASTODON` | Mastodon 地址    | `mastodon.social/@Mastodon` |
+| `BLUESKY`  | Bluesky Handle   | `bsky.app`                  |
+| `DISCORD`  | Discord 链接     | `https://discord.com/...`   |
+| `PODCAST`  | Podcast 链接     | `https://podcast.com/...`   |
 
-## 头部尾部代码注入，支持 HTML
-FOOTER_INJECT=FOOTER_INJECT
-HEADER_INJECT=HEADER_INJECT
+### SEO / 展示
 
-## SEO 配置项，可不让搜索引擎索引内容
-NO_FOLLOW=false
-NO_INDEX=false
+| 变量                 | 说明            | 默认              |
+| -------------------- | --------------- | ----------------- |
+| `NO_FOLLOW`          | 禁止爬虫跟踪    | `false`           |
+| `NO_INDEX`           | 禁止收录        | `false`           |
+| `HIDE_DESCRIPTION`   | 隐藏频道简介    | `false`           |
+| `GOOGLE_SEARCH_SITE` | Google 站内搜索 | `your-domain.com` |
 
-## 隐藏 Telegram 频道简介
-HIDE_DESCRIPTION=false
+### 关键词过滤（全站生效）
 
-## Sentry 配置项，收集服务端报错
-SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN
-SENTRY_DSN=SENTRY_DSN
-SENTRY_PROJECT=SENTRY_PROJECT
+| 变量              | 说明                             | 示例            |
+| ----------------- | -------------------------------- | --------------- |
+| `FILTER_KEYWORDS` | 过滤关键词（逗号/分号/换行分隔） | `spam,ads,nsfw` |
 
-## Telegram 主机名称和静态资源代理，不建议修改
-TELEGRAM_HOST=telegram.dog
-STATIC_PROXY=
+匹配规则：大小写不敏感的包含匹配，覆盖 `title` / `text` / `tags`。
 
-## 启用谷歌站内搜索
-GOOGLE_SEARCH_SITE=your-domain.com
+### 其他
 
-## 启用标签页, 标签使用英文逗号分割
-TAGS=标签A,标签B,标签C
+| 变量            | 说明                   | 示例                     |
+| --------------- | ---------------------- | ------------------------ |
+| `TAGS`          | 标签页启用（逗号分隔） | `tag1,tag2`              |
+| `COMMENTS`      | 评论开关               | `true`                   |
+| `REACTIONS`     | Reactions 开关         | `true`                   |
+| `LINKS`         | Links 页面列表         | `Title,URL;Title2,URL2;` |
+| `NAVS`          | 侧边栏导航             | `Title,URL;Title2,URL2;` |
+| `RSS_BEAUTIFY`  | RSS 美化               | `true`                   |
+| `FOOTER_INJECT` | Footer 注入            | HTML                     |
+| `HEADER_INJECT` | Header 注入            | HTML                     |
 
-## 关键词过滤（英文逗号/分号/换行分隔）
-FILTER_KEYWORDS=关键词1,关键词2,关键词3
+---
 
-## 展示评论
-COMMENTS=true
+## 设置页与优先级
 
-## 展示 Reactions
-REACTIONS=true
+- `/settings` 可设置 **目标频道** 与 **关键词过滤**
+- 设置结果保存在 Cookie 中
+- 若环境变量 `CHANNEL` / `FILTER_KEYWORDS` 已配置，则设置页对应字段会被禁用，并以环境变量为准
 
-## 链接页面中的超链接, 使用英文逗号和分号分割
-LINKS=Title1,URL1;Title2,URL3;Title3,URL3;
+---
 
-## 侧边栏导航项, 使用英文逗号和分号分割
-NAVS=Title1,URL1;Title2,URL3;Title3,URL3;
+## 常见问题
 
-## 启用 RSS 美化
-RSS_BEAUTIFY=true
-```
+**为什么部署后内容为空？**
 
-## 🙋🏻 常问问题
+- 频道必须是公开频道
+- 用户名是字符串而不是数字
+- 关闭频道的 “Restricting Saving Content”
+- 修改环境变量后需要重新部署
+- 部分敏感频道可能被 Telegram 限制展示
 
-1. 为什么部署后内容为空？
-   - 检查频道是否是公开的，必须是公开的
-   - 频道用户名是字符串，不是数字
-   - 关闭频道 Restricting Saving Content 设置项
-   - 修改完环境变量后需要重新部署
-   - Telegram 会屏蔽一些敏感频道的公开展示， 可以通过访问 `https://t.me/s/频道用户名` 确认
+---
 
-## 🤝 支持
+## 许可协议
 
-如果 TGNext 对你有帮助，欢迎 Star 并分享给朋友。
+本项目使用 **AGPL-3.0-or-later** 许可证。
+
+---
+
+## 致谢
+
+TGNext 基于 [BroadcastChannel](https://github.com/miantiao-me/BroadcastChannel) 进行改造。
