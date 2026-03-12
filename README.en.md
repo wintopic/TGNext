@@ -1,138 +1,193 @@
-# TGNext
-
-**Turn your Telegram Channel into a MicroBlog.**
+<div align="center">
+  <h1>TGNext</h1>
+  <p>Turn your Telegram Channel into a lightweight microblog.</p>
+  <p>
+    <a href="https://github.com/wintopic/TGNext"><img alt="License" src="https://img.shields.io/badge/License-AGPL--3.0--or--later-blue.svg" /></a>
+    <a href="https://astro.build/"><img alt="Astro" src="https://img.shields.io/badge/Astro-SSR-ff5d01?logo=astro&logoColor=white" /></a>
+    <a href="https://pages.cloudflare.com/"><img alt="Cloudflare Pages" src="https://img.shields.io/badge/Cloudflare%20Pages-Ready-f48120?logo=cloudflare&logoColor=white" /></a>
+    <img alt="Minimal JS" src="https://img.shields.io/badge/Minimal%20JS-yes-6c5ce7" />
+  </p>
+  <p>
+    English | <a href="./README.md">简体中文</a>
+  </p>
+</div>
 
 ---
 
-English | [简体中文](./README.md)
+<details>
+<summary><strong>Table of Contents</strong></summary>
 
-## ✨ Features
+- [Overview](#overview)
+- [Highlights](#highlights)
+- [Architecture](#architecture)
+- [Quick Start](#quick-start)
+- [Deploy](#deploy)
+- [Configuration](#configuration)
+- [Keyword Filtering](#keyword-filtering)
+- [Settings & Priority](#settings--priority)
+- [FAQ](#faq)
+- [License](#license)
+- [Credits](#credits)
 
-- **Turn your Telegram Channel into a MicroBlog**
-- **SEO friendly** `/sitemap.xml`
-- **Minimal JS on the browser side** (theme switch + optional highlight)
-- **RSS and RSS JSON** `/rss.xml` `/rss.json`
-- **Themes** 3 presets + dark mode
-- **Keyword filters** via env + settings page
+</details>
 
-## 🪧 Demo
+---
 
-- Deploy your own TGNext on Cloudflare Pages, Netlify, or Vercel.
+## Overview
 
-### Platform
+TGNext is an Astro SSR microblog that turns a Telegram channel into a searchable, tag-aware, RSS-friendly site.
 
-- Cloudflare Pages (recommended)
-- Netlify
-- Vercel
+- Cloudflare Pages / Netlify / Vercel ready
+- 3 theme presets + dark mode
+- Keyword filtering across pages, RSS, and sitemap
 
-TGNext supports deployment on serverless platforms like Cloudflare, Netlify, Vercel that support Node.js SSR, or on a VPS.
-For detailed tutorials, see [Deploy your Astro site](https://docs.astro.build/en/guides/deploy/).
+> [!NOTE]
+> Keyword filters prioritize **environment variables** and apply globally.
 
-## 🧱 Tech Stack
+---
 
-- Framework: [Astro](https://astro.build/)
-- CMS: [Telegram Channels](https://telegram.org/tour/channels)
-- Template: [Sepia](https://github.com/Planetable/SiteTemplateSepia)
+## Highlights
 
-## 🙏 Credits
+- **Telegram as CMS**: no backend required
+- **SEO friendly**: `/sitemap.xml` + `NO_INDEX` / `NO_FOLLOW`
+- **Minimal JS**: only theme toggle + optional highlight
+- **RSS & JSON Feed**: `/rss.xml` / `/rss.json`
+- **Search & Tags**: built-in search and tag aggregation
+- **Settings Page**: channel & filter settings
 
-TGNext is a fork of [BroadcastChannel](https://github.com/miantiao-me/BroadcastChannel).
+---
 
-## 🏗️ Deployment
+## Architecture
 
-### Docker
-
-1. `docker build -t tgnext .`
-2. `docker run -d --name tgnext -p 4321:4321 -e CHANNEL=your_channel tgnext`
-
-If you enable the included GitHub Actions workflow, images will be published to:
-`ghcr.io/<owner>/tgnext:main`
-
-### Serverless
-
-1. Fork this project to your GitHub (or use it as a template)
-2. Create a project on Cloudflare/Netlify/Vercel
-3. Select the `TGNext` project and the `Astro` framework
-4. Configure the environment variable `CHANNEL` with your channel name. This is the minimal configuration, for more configurations see the options below
-5. Save and deploy
-6. Bind a domain (optional).
-7. Update code, refer to the official GitHub documentation [Syncing a fork branch from the web UI](https://docs.github.com/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-web-ui).
-
-## ⚒️ Configuration
-
-```env
-## Telegram Channel Username, must be configured. The string of characters following t.me/
-CHANNEL=your_channel
-
-## Language and timezone settings, language options see [dayjs](https://github.com/iamkun/dayjs/tree/dev/src/locale)
-LOCALE=en
-TIMEZONE=America/New_York
-
-## Social media usernames
-TELEGRAM=your_telegram
-TWITTER=your_twitter
-GITHUB=your_github
-MASTODON=mastodon.social/@Mastodon
-BLUESKY=bsky.app
-
-## The following two social media need to be URLs
-DISCORD=https://DISCORD.com
-PODCAST=https://PODCAST.com
-
-## Header and footer code injection, supports HTML
-FOOTER_INJECT=FOOTER_INJECT
-HEADER_INJECT=HEADER_INJECT
-
-## SEO configuration options, can prevent search engines from indexing content
-NO_FOLLOW=false
-NO_INDEX=false
-
-## Hide Telegram channel description
-HIDE_DESCRIPTION=false
-
-## Sentry configuration options, collect server-side errors
-SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN
-SENTRY_DSN=SENTRY_DSN
-SENTRY_PROJECT=SENTRY_PROJECT
-
-## Telegram host name and static resource proxy, not recommended to modify
-TELEGRAM_HOST=telegram.dog
-STATIC_PROXY=
-
-## Enable Google Site Search
-GOOGLE_SEARCH_SITE=your-domain.com
-
-## Enable tags page, separate tags with commas
-TAGS=tag1,tag2,tag3
-
-## Filter posts by keywords (comma/semicolon/newline separated)
-FILTER_KEYWORDS=keyword1,keyword2,keyword3
-
-## Show comments
-COMMENTS=true
-
-## Show reactions
-REACTIONS=true
-
-## List of links in the Links page, Separate using commas and semicolons
-LINKS=Title1,URL1;Title2,URL3;Title3,URL3;
-
-## Sidebar Navigation Item, Separate using commas and semicolons
-NAVS=Title1,URL1;Title2,URL3;Title3,URL3;
-
-## Enable RSS beautify
-RSS_BEAUTIFY=true
+```mermaid
+flowchart LR
+  TG[Telegram Channel] -->|Fetch| TGNext
+  TGNext --> Web[Website]
+  TGNext --> RSS[RSS / JSON]
+  TGNext --> SEO[Sitemap]
 ```
 
-## 🙋🏻 FAQs
+---
 
-1. Why is the content empty after deployment?
-   - Check if the channel is public, it must be public
-   - The channel username is a string, not a number
-   - Turn off the "Restricting Saving Content" setting in the channel
-   - Redeploy after modifying environment variables
-   - Telegram blocks public display of some sensitive channels, you can verify by visiting `https://t.me/s/channelusername`.
+## Quick Start
 
-## 🤝 Support
+```bash
+git clone https://github.com/wintopic/TGNext.git
+cd TGNext
+pnpm install
+CHANNEL=your_channel pnpm dev
+```
 
-If TGNext helps you, please consider starring the repo and sharing it with others.
+> [!TIP]
+> You can copy `.env.example` to `.env` for local configuration.
+
+---
+
+## Deploy
+
+### Cloudflare Pages (Recommended)
+
+1. Create a TGNext repo on GitHub
+2. Create a Cloudflare Pages project, select `Astro`
+3. Set the `CHANNEL` environment variable
+4. Deploy
+
+### Netlify / Vercel
+
+Same flow: choose `Astro` and set `CHANNEL`.
+
+### Build (Cloudflare Pages)
+
+```bash
+SERVER_ADAPTER=cloudflare_pages pnpm build
+```
+
+---
+
+## Configuration
+
+Copy `.env.example` to `.env`. At minimum, set `CHANNEL`.
+
+### Required
+
+| Variable  | Description               | Example        |
+| --------- | ------------------------- | -------------- |
+| `CHANNEL` | Telegram channel username | `your_channel` |
+
+### Common
+
+| Variable   | Description        | Example                     |
+| ---------- | ------------------ | --------------------------- |
+| `LOCALE`   | Language           | `en`                        |
+| `TIMEZONE` | Timezone           | `America/New_York`          |
+| `TELEGRAM` | Telegram username  | `your_telegram`             |
+| `TWITTER`  | X/Twitter username | `your_twitter`              |
+| `GITHUB`   | GitHub username    | `your_github`               |
+| `MASTODON` | Mastodon handle    | `mastodon.social/@Mastodon` |
+| `BLUESKY`  | Bluesky handle     | `bsky.app`                  |
+| `DISCORD`  | Discord URL        | `https://discord.com/...`   |
+| `PODCAST`  | Podcast URL        | `https://podcast.com/...`   |
+
+<details>
+<summary><strong>More variables</strong></summary>
+
+| Variable             | Description                               | Default/Example          |
+| -------------------- | ----------------------------------------- | ------------------------ |
+| `NO_FOLLOW`          | Disallow crawler follow                   | `false`                  |
+| `NO_INDEX`           | Disallow indexing                         | `false`                  |
+| `HIDE_DESCRIPTION`   | Hide channel description                  | `false`                  |
+| `GOOGLE_SEARCH_SITE` | Google site search                        | `your-domain.com`        |
+| `FILTER_KEYWORDS`    | Filter keywords (comma/semicolon/newline) | `spam,ads,nsfw`          |
+| `TAGS`               | Tags page list                            | `tag1,tag2`              |
+| `COMMENTS`           | Comments toggle                           | `true`                   |
+| `REACTIONS`          | Reactions toggle                          | `true`                   |
+| `LINKS`              | Links list                                | `Title,URL;Title2,URL2;` |
+| `NAVS`               | Sidebar nav                               | `Title,URL;Title2,URL2;` |
+| `RSS_BEAUTIFY`       | Beautify RSS                              | `true`                   |
+| `FOOTER_INJECT`      | Footer inject                             | HTML                     |
+| `HEADER_INJECT`      | Header inject                             | HTML                     |
+
+</details>
+
+---
+
+## Keyword Filtering
+
+- Rule: case-insensitive **contains** match
+- Fields: `title` / `text` / `tags`
+- Scope: **list / detail / RSS / sitemap**
+
+> [!IMPORTANT]
+> If `FILTER_KEYWORDS` is set, the settings page field is disabled and the env value wins.
+
+---
+
+## Settings & Priority
+
+- `/settings` lets you set **target channel** and **filter keywords**
+- Values are stored in cookies
+- If `CHANNEL` / `FILTER_KEYWORDS` are set in env, they take precedence
+
+---
+
+## FAQ
+
+**Why is the content empty after deployment?**
+
+- The channel must be public
+- The username is a string, not a number
+- Disable “Restricting Saving Content”
+- Redeploy after changing env vars
+- Some channels may be blocked by Telegram
+
+---
+
+## License
+
+AGPL-3.0-or-later.
+
+---
+
+## Credits
+
+TGNext is forked from [BroadcastChannel](https://github.com/miantiao-me/BroadcastChannel).
