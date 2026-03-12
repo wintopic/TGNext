@@ -1,4 +1,4 @@
-# 广播频道
+# TGNext
 
 **将你的 Telegram Channel 转为微博客。**
 
@@ -10,52 +10,23 @@
 
 - **将 Telegram Channel 转为微博客**
 - **SEO 友好** `/sitemap.xml`
-- **浏览器端 0 JS**
+- **浏览器端最小化 JS**（主题切换 + 可选高亮）
 - **提供 RSS 和 RSS JSON** `/rss.xml` `/rss.json`
+- **主题系统** 3 套主题 + 暗黑模式
+- **关键词过滤** 支持变量与设置页
 
 ## 🪧 演示
 
-### 真实用户
-
-- [面条实验室](https://memo.miantiao.me/)
-- [Find Blog👁发现博客](https://broadcastchannel.pages.dev/)
-- [Memos 广场 🎪](https://now.memobbs.app/)
-- [APPDO 数字生活指南](https://mini.appdo.xyz/)
-- [85.60×53.98卡粉订阅/提醒](https://tg.docofcard.com/)
-- [新闻在花频道](https://tg.istore.app/)
-- [ALL About RSS](https://blog.rss.tips/)
-- [Charles Chin's Whisper](https://memo.eallion.com/)
-- [PlayStation 新闻转发](https://playstationnews.pages.dev)
-- [Yu's Life](https://daily.pseudoyu.com/)
-- [Leslie 和朋友们](https://tg.imlg.co/)
-- [OKHK 分享](https://tg.okhk.net/)
-- [gledos 的微型博客](https://microblogging.gledos.science)
-- [Steve Studio](https://tgc.surgeee.me/)
-- [LiFePO4:沙雕吐槽](https://lifepo4.top)
-- [Hotspot Hourly](https://hourly.top/)
-- [大河马中文财经新闻分享](https://a.xiaomi318.com/)
-- [\_My. Tricks 🎩 Collection](https://channel.mykeyvans.com)
-- [小报童专栏精选](https://xiaobaotong.genaiprism.site/)
-- [Fake news](https://fake-news.csgo.ovh/)
-- [miyi23's Geekhub资源分享](https://gh.miyi23.top/)
-- [Magazine｜期刊杂志｜财新周刊](https://themagazine.top)
-- [Remote Jobs & Cooperation](https://share-remote-jobs.vercel.app/)
-- [甬哥侃侃侃--频道发布](https://ygkkktg.pages.dev)
-- [Fugoou.log](https://fugoou.xyz)
-- [Bboysoul的博客](https://tg.bboy.app/)
-- [MakerHunter](https://share.makerhunter.com/)
-- [ChatGPT/AI新闻聚合](https://g4f.icu/)
-- [Abner's memos](https://memos.abnerz6.top/)
-- [小众软件的发现](https://talk.appinn.net/)
-- [小报童优惠与排行榜](https://youhui.xiaobaoto.com/)
+- 在 Cloudflare Pages、Netlify 或 Vercel 部署你自己的 TGNext。
+- 想展示你的公开部署？欢迎提交 PR。
 
 ### 平台
 
-1. [Cloudflare](https://broadcast-channel.pages.dev/)
-2. [Netlify](https://broadcast-channel.netlify.app/)
-3. [Vercel](https://broadcast-channel.vercel.app/)
+- Cloudflare Pages（推荐）
+- Netlify
+- Vercel
 
-广播频道支持部署在 Cloudflare、Netlify、Vercel 等支持 Node.js SSR 的无服务器平台或者 VPS。
+TGNext 支持部署在 Cloudflare、Netlify、Vercel 等支持 Node.js SSR 的无服务器平台或者 VPS。
 具体教程见[部署你的 Astro 站点](https://docs.astro.build/zh-cn/guides/deploy/)。
 
 ## 🧱 技术栈
@@ -64,18 +35,25 @@
 - 内容管理系统：[Telegram Channels](https://telegram.org/tour/channels)
 - 模板: [Sepia](https://github.com/Planetable/SiteTemplateSepia)
 
+## 🙏 致谢
+
+TGNext 基于 [BroadcastChannel](https://github.com/miantiao-me/BroadcastChannel) 进行改造。
+
 ## 🏗️ 部署
 
 ### Docker
 
-1. `docker pull ghcr.io/miantiao-me/broadcastchannel:main`
-2. `docker run -d --name broadcastchannel -p 4321:4321 -e CHANNEL=miantiao_me ghcr.io/miantiao-me/broadcastchannel:main`
+1. `docker build -t tgnext .`
+2. `docker run -d --name tgnext -p 4321:4321 -e CHANNEL=your_channel tgnext`
+
+如果启用仓库内置的 GitHub Actions 工作流，镜像会发布到：
+`ghcr.io/<owner>/tgnext:main`
 
 ### Serverless
 
-1. [Fork](https://github.com/miantiao-me/BroadcastChannel/fork) 此项目到你 GitHub
+1. 先 Fork 本项目到你的 GitHub（或作为模板使用）
 2. 在 Cloudflare/Netlify/Vercel 创建项目
-3. 选择 `BroadcastChannel` 项目和 `Astro` 框架
+3. 选择 `TGNext` 项目和 `Astro` 框架
 4. 配置环境变量 `CHANNEL` 为你的频道名称。此为最小化配置，更多配置见下面的配置项
 5. 保存并部署
 6. 绑定域名（可选）。
@@ -85,20 +63,20 @@
 
 ```env
 ## Telegram 频道用户名，必须配置。 t.me/ 后面那串字符
-CHANNEL=miantiao_me
+CHANNEL=your_channel
 
 ## 语言和时区设置，语言选项见[dayjs](https://github.com/iamkun/dayjs/tree/dev/src/locale)
 LOCALE=zh-cn
 TIMEZONE=Asia/Shanghai
 
 ## 社交媒体用户名
-TELEGRAM=miantiao-me
-TWITTER=miantiao-me
-GITHUB=miantiao-me
+TELEGRAM=your_telegram
+TWITTER=your_twitter
+GITHUB=your_github
 
 ## 下面两个社交媒体需要为 URL
 DISCORD=https://DISCORD.com
-PODCASRT=https://PODCASRT.com
+PODCAST=https://PODCAST.com
 
 ## 头部尾部代码注入，支持 HTML
 FOOTER_INJECT=FOOTER_INJECT
@@ -117,14 +95,17 @@ SENTRY_DSN=SENTRY_DSN
 SENTRY_PROJECT=SENTRY_PROJECT
 
 ## Telegram 主机名称和静态资源代理，不建议修改
-HOST=telegram.dog
+TELEGRAM_HOST=telegram.dog
 STATIC_PROXY=
 
 ## 启用谷歌站内搜索
-GOOGLE_SEARCH_SITE=memo.miantiao.me
+GOOGLE_SEARCH_SITE=your-domain.com
 
 ## 启用标签页, 标签使用英文逗号分割
 TAGS=标签A,标签B,标签C
+
+## 关键词过滤（英文逗号/分号/换行分隔）
+FILTER_KEYWORDS=关键词1,关键词2,关键词3
 
 ## 展示评论
 COMMENTS=true
@@ -151,8 +132,6 @@ RSS_BEAUTIFY=true
    - 修改完环境变量后需要重新部署
    - Telegram 会屏蔽一些敏感频道的公开展示， 可以通过访问 `https://t.me/s/频道用户名` 确认
 
-## ☕ 赞助
+## 🤝 支持
 
-1. [在 Telegram 关注我](https://t.me/miantiao_me)
-2. [在 𝕏 上关注我](https://404.li/x)
-3. [在 GitHub 赞助我](https://github.com/sponsors/miantiao-me)
+如果 TGNext 对你有帮助，欢迎 Star 并分享给朋友。

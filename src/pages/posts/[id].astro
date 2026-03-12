@@ -1,11 +1,13 @@
 ---
 import { getEnv } from '../../lib/env'
+import { getUiLabels } from '../../lib/i18n'
 import voidFile from '../../assets/void.png'
 import List from '../../components/list.astro'
 import { getChannelInfo } from '../../lib/telegram'
 
 const { SITE_URL } = Astro.locals
 
+const labels = getUiLabels(Astro)
 const channelInfo = await getChannelInfo(Astro)
 
 const post = await getChannelInfo(Astro, {
@@ -13,16 +15,24 @@ const post = await getChannelInfo(Astro, {
   id: Astro.params.id,
 })
 
+const isFiltered = post?.filtered || !post?.id
 const channel = {
   ...(channelInfo || {}),
-  posts: [post],
-  seo: post,
+  posts: isFiltered ? [] : [post],
+  seo: isFiltered ? { title: labels.filtered } : post,
 }
 
 const staticProxy = getEnv(import.meta.env, Astro, 'STATIC_PROXY') ?? '/static/'
 ---
 
-<List channel={channel} before={false} after={false} isItem={true}>
+<List
+  channel={channel}
+  before={false}
+  after={false}
+  isItem={true}
+  emptyTitle={labels.filtered}
+  emptyHint={labels.filteredHint}
+>
   <div slot="header" id="breadcrumb">
     <img
       src={channel?.avatar?.startsWith('http') ? staticProxy + channel?.avatar : voidFile.src}

@@ -1,0 +1,78 @@
+import { getEnv } from './env'
+
+export function getUiLabels(Astro) {
+  const locale = getEnv(import.meta.env, Astro, 'LOCALE') ?? 'en'
+  const isZh = locale.toLowerCase().startsWith('zh')
+
+  if (isZh) {
+    return {
+      home: '首页',
+      tags: '标签',
+      links: '链接',
+      settings: '设置',
+      search: '搜索',
+      searchPlaceholder: '搜索关键词或 #标签',
+      searchResults: '搜索结果',
+      tagResults: '标签结果',
+      searchEmpty: '没有找到相关内容',
+      searchTip: '试试更短的关键词或点击标签',
+      clear: '清空',
+      back: '返回首页',
+      before: '前一页',
+      after: '后一页',
+      noPosts: '暂无内容',
+      filtered: '该内容已被过滤或不存在',
+      filteredHint: '请检查关键词过滤设置或频道权限',
+      save: '保存设置',
+      channel: '目标频道',
+      keywords: '需要过滤的关键词',
+      channelPlaceholder: 'your_channel',
+      keywordsPlaceholder: '关键词1,关键词2',
+      keywordsHint: '支持英文逗号 / 分号 / 换行分隔',
+      settingsTitle: '站点设置',
+      controlledByEnv: '由变量和机密控制',
+      rss: '订阅 RSS',
+      theme: '主题',
+      mode: '模式',
+      light: '浅色',
+      dark: '深色',
+      system: '系统',
+      editSettings: '修改设置',
+    }
+  }
+
+  return {
+    home: 'Home',
+    tags: 'Tags',
+    links: 'Links',
+    settings: 'Settings',
+    search: 'Search',
+    searchPlaceholder: 'Search keywords or #tag',
+    searchResults: 'Search Results',
+    tagResults: 'Tag Results',
+    searchEmpty: 'No results found',
+    searchTip: 'Try a shorter query or pick a tag',
+    clear: 'Clear',
+    back: 'Back to Home',
+    before: 'Before',
+    after: 'After',
+    noPosts: 'No posts yet',
+    filtered: 'This content is filtered or unavailable',
+    filteredHint: 'Check your keyword filters or channel permissions',
+    save: 'Save Settings',
+    channel: 'Target Channel',
+    keywords: 'Filter Keywords',
+    channelPlaceholder: 'your_channel',
+    keywordsPlaceholder: 'keyword1,keyword2',
+    keywordsHint: 'Comma / semicolon / newline separated',
+    settingsTitle: 'Site Settings',
+    controlledByEnv: 'Controlled by environment',
+    rss: 'RSS Feed',
+    theme: 'Theme',
+    mode: 'Mode',
+    light: 'Light',
+    dark: 'Dark',
+    system: 'System',
+    editSettings: 'Edit Settings',
+  }
+}

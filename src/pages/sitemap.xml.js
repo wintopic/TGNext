@@ -7,13 +7,15 @@ export async function GET(Astro) {
   const posts = channel.posts || []
 
   const pageSize = 20
-  let count = +posts[0]?.id
+  let count = +posts[0]?.id || 0
 
   const pages = []
-  pages.push(count)
-  while (count > pageSize) {
-    count -= pageSize
+  if (count > 0) {
     pages.push(count)
+    while (count > pageSize) {
+      count -= pageSize
+      pages.push(count)
+    }
   }
 
   const sitemaps = pages.map((page) => {

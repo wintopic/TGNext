@@ -4,10 +4,13 @@ import '../assets/style.css'
 import '../assets/global.css'
 import { SEO } from 'astro-seo'
 import { getEnv } from '../lib/env'
+import { getUiLabels } from '../lib/i18n'
 import backToTopIcon from '../assets/back-to-top.svg'
 
 const { SITE_URL, RSS_URL, RSS_PREFIX } = Astro.locals
 const { channel } = Astro.props
+
+const labels = getUiLabels(Astro)
 
 const locale = getEnv(import.meta.env, Astro, 'LOCALE')
 
@@ -49,12 +52,29 @@ const seoParams = {
 }
 
 const GOOGLE_SEARCH_SITE = getEnv(import.meta.env, Astro, 'GOOGLE_SEARCH_SITE')
-const searchAction = GOOGLE_SEARCH_SITE ? 'https://www.google.com/search' : '/search/result'
+const searchAction = GOOGLE_SEARCH_SITE ? 'https://www.google.com/search' : '/search'
 
 const HEADER_INJECT = getEnv(import.meta.env, Astro, 'HEADER_INJECT')
 const FOOTER_INJECT = getEnv(import.meta.env, Astro, 'FOOTER_INJECT')
 const TAGS = getEnv(import.meta.env, Astro, 'TAGS')
 const LINKS = getEnv(import.meta.env, Astro, 'LINKS')
+
+const tags = (TAGS || '')
+  .split(',')
+  .map(tag => tag.trim())
+  .filter(Boolean)
+
+const links = (LINKS || '')
+  .split(';')
+  .filter(Boolean)
+  .map((link) => {
+    link = link.split(',')
+    return {
+      title: link[0],
+      href: link[1],
+    }
+  })
+
 const navs = (getEnv(import.meta.env, Astro, 'NAVS') || '')
   .split(';')
   .filter(Boolean)
@@ -65,23 +85,41 @@ const navs = (getEnv(import.meta.env, Astro, 'NAVS') || '')
       href: link[1],
     }
   })
+
+const searchQuery = Astro.url.searchParams.get('q') || ''
+const pathQuery = Astro.params?.q ? decodeURIComponent(Astro.params.q) : ''
+const currentQuery = searchQuery || pathQuery
+const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '') : ''
 ---
 
 <!doctype html>
-<html lang={locale ?? 'en'}>
+<html lang={locale ?? 'en'} data-theme="sepia" data-mode="light" data-mode-preference="system">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f4f1ec" />
+    <meta name="theme-color" content="#f7f1e8" />
     <link rel="alternate" type="application/rss+xml" title={`${RSS_PREFIX}${channel?.title}`} href={RSS_URL} />
     <style is:inline>
       @view-transition {
-        navigation: auto; /* enabled */
+        navigation: auto;
       }
     </style>
+    <script is:inline>
+      (() => {
+        const doc = document.documentElement
+        const storedTheme = localStorage.getItem('tgnext-theme') || 'sepia'
+        const storedMode = localStorage.getItem('tgnext-mode') || 'system'
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        const resolvedMode = storedMode === 'system' ? (systemDark ? 'dark' : 'light') : storedMode
+
+        doc.dataset.theme = storedTheme
+        doc.dataset.mode = resolvedMode
+        doc.dataset.modePreference = storedMode
+      })()
+    </script>
     <SEO
-      titleTemplate={`%s | ${channel?.title}`}
-      titleDefault={[channel?.title, seoParams.description].filter(Boolean).join(' - ')}
+      titleTemplate={`%s | ${channel?.title} · TGNext`}
+      titleDefault={[channel?.title, seoParams.description, 'TGNext'].filter(Boolean).join(' · ')}
       twitter={{
         card: 'summary_large_image',
         creator: twitter ? `@${twitter}` : undefined,
@@ -91,82 +129,196 @@ const navs = (getEnv(import.meta.env, Astro, 'NAVS') || '')
     <Fragment set:html={HEADER_INJECT} />
   </head>
 
-  <body>
-    <div id="wrapper">
-      <div id="container">
-        <div id="main-container">
-          <slot />
+  <body id="top">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="sidebar-head">
+          <a class="brand" href={SITE_URL} title="TGNext">
+            TGNext
+          </a>
+          <div class="brand-subtitle">{channel?.title}</div>
         </div>
-        <div id="aside-container">
-          <slot name="aside">
-            <div class="nav">
-              <div class="nav-item">
-                <a href={SITE_URL} title={channel?.title} class={`nav-link ${pathname === '/' ? 'current' : ''}`}>
-                  Home
+
+        <div class="sidebar-block">
+          <div class="nav">
+            <a href={SITE_URL} title={labels.home} class={`nav-link ${pathname === '/' ? 'current' : ''}`}>
+              {labels.home}
+            </a>
+            {
+              TAGS ? (
+                <a href={`${SITE_URL}tags`} title={labels.tags} class={`nav-link ${pathname === '/tags' ? 'current' : ''}`}>
+                  {labels.tags}
                 </a>
-              </div>
-              {
-                TAGS ? (
-                  <div class="nav-item">
-                    <a
-                      href={`${SITE_URL}tags`}
-                      title="Tags"
-                      class={`nav-link ${pathname === '/tags' ? 'current' : ''}`}
-                    >
-                      Tags
-                    </a>
-                  </div>
-                ) : null
-              }
-              {
-                LINKS ? (
-                  <div class="nav-item">
-                    <a
-                      href={`${SITE_URL}links`}
-                      title="Links"
-                      class={`nav-link ${pathname === '/links' ? 'current' : ''}`}
-                    >
-                      Links
-                    </a>
-                  </div>
-                ) : null
-              }
-              {
-                navs.map((nav) => (
-                  <div class="nav-item">
-                    <a href={nav.href} title={nav.title} target="_blank" rel="noopener" class="nav-link">
-                      {nav.title}
-                    </a>
-                  </div>
-                ))
-              }
-            </div>
-            <input class="search-icon" name="icon" type="checkbox" placeholder="Search" />
-            <form class="search-form" action={searchAction} method="get">
-              {GOOGLE_SEARCH_SITE ? <input type="hidden" name="as_sitesearch" value={GOOGLE_SEARCH_SITE} /> : null}
-              <input type="text" name="q" placeholder="Search" />
-            </form>
-            <div class="copyright-wrap">
-              Powered by
-              <a
-                href="https://github.com/miantiao-me/BroadcastChannel"
-                title="BroadcastChannel"
-                target="_blank"
-                rel="noopener"
-              >
-                BroadcastChannel
-              </a> &
-              <a href="https://github.com/Planetable/SiteTemplateSepia" title="Sepia" target="_blank" rel="noopener">
-                Sepia
-              </a>
-            </div>
-          </slot>
+              ) : null
+            }
+            {
+              LINKS ? (
+                <a href={`${SITE_URL}links`} title={labels.links} class={`nav-link ${pathname === '/links' ? 'current' : ''}`}>
+                  {labels.links}
+                </a>
+              ) : null
+            }
+            <a href={`${SITE_URL}settings`} title={labels.settings} class={`nav-link ${pathname === '/settings' ? 'current' : ''}`}>
+              {labels.settings}
+            </a>
+            {
+              navs.map((nav) => (
+                <a href={nav.href} title={nav.title} target="_blank" rel="noopener" class="nav-link">
+                  {nav.title}
+                </a>
+              ))
+            }
+          </div>
         </div>
-      </div>
+
+        <div class="sidebar-block">
+          <form class="search-form" action={searchAction} method="get">
+            {GOOGLE_SEARCH_SITE ? <input type="hidden" name="as_sitesearch" value={GOOGLE_SEARCH_SITE} /> : null}
+            <label class="search-label" for="search-input">{labels.search}</label>
+            <div class="search-input-wrap">
+              <input id="search-input" type="text" name="q" placeholder={labels.searchPlaceholder} defaultValue={currentQuery} />
+              <button type="submit" class="icon-button" aria-label={labels.search}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M15.5 15.5L20 20M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {
+          tags.length > 0 && (
+            <div class="sidebar-block">
+              <div class="block-title">{labels.tags}</div>
+              <div class="tag-list">
+                {tags.map(tag => (
+                  <a
+                    href={`/search/%23${tag}`}
+                    class={`tag-chip ${currentTag === tag ? 'active' : ''}`}
+                    title={tag}
+                  >
+                    #{tag}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )
+        }
+
+        {
+          links.length > 0 && (
+            <div class="sidebar-block">
+              <div class="block-title">{labels.links}</div>
+              <div class="link-list">
+                {links.map(link => (
+                  <a href={link.href} class="link-chip" target="_blank" rel="noopener" title={link.title}>
+                    {link.title}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )
+        }
+
+        <div class="sidebar-block">
+          <div class="block-title">{labels.theme}</div>
+          <div class="theme-switch">
+            <button class="switch-chip" type="button" data-theme-value="sepia" aria-pressed="false">Sepia</button>
+            <button class="switch-chip" type="button" data-theme-value="minimal" aria-pressed="false">Minimal</button>
+            <button class="switch-chip" type="button" data-theme-value="bold" aria-pressed="false">Bold</button>
+          </div>
+          <div class="block-title">{labels.mode}</div>
+          <div class="theme-switch">
+            <button class="switch-chip" type="button" data-mode-value="light" aria-pressed="false">{labels.light}</button>
+            <button class="switch-chip" type="button" data-mode-value="dark" aria-pressed="false">{labels.dark}</button>
+            <button class="switch-chip" type="button" data-mode-value="system" aria-pressed="false">{labels.system}</button>
+          </div>
+        </div>
+
+        <div class="sidebar-footer">
+          <span>Powered by</span>
+          <a href="https://github.com/wintopic/TGNext" target="_blank" rel="noopener">TGNext</a>
+          <span>·</span>
+          <a href="https://github.com/Planetable/SiteTemplateSepia" target="_blank" rel="noopener">Sepia</a>
+        </div>
+      </aside>
+
+      <main class="main">
+        <slot />
+      </main>
     </div>
-    <a href="#wrapper" id="back-to-top" aria-label="Back to top">
+
+    <a href="#top" id="back-to-top" aria-label="Back to top">
       <img {...backToTopIcon} alt="Back to Top" />
     </a>
     <Fragment set:html={FOOTER_INJECT} />
+
+    <script is:inline>
+      (() => {
+        const doc = document.documentElement
+        const themeButtons = document.querySelectorAll('[data-theme-value]')
+        const modeButtons = document.querySelectorAll('[data-mode-value]')
+        const media = window.matchMedia('(prefers-color-scheme: dark)')
+
+        function resolveMode(modePreference) {
+          if (modePreference === 'system')
+            return media.matches ? 'dark' : 'light'
+          return modePreference
+        }
+
+        function updateButtons() {
+          const theme = doc.dataset.theme
+          const modePreference = doc.dataset.modePreference || 'system'
+
+          themeButtons.forEach((button) => {
+            button.setAttribute('aria-pressed', button.dataset.themeValue === theme)
+          })
+
+          modeButtons.forEach((button) => {
+            button.setAttribute('aria-pressed', button.dataset.modeValue === modePreference)
+          })
+        }
+
+        function setTheme(theme) {
+          localStorage.setItem('tgnext-theme', theme)
+          doc.dataset.theme = theme
+          updateButtons()
+        }
+
+        function setMode(modePreference) {
+          localStorage.setItem('tgnext-mode', modePreference)
+          doc.dataset.modePreference = modePreference
+          doc.dataset.mode = resolveMode(modePreference)
+          updateButtons()
+        }
+
+        document.addEventListener('click', (event) => {
+          const themeButton = event.target.closest('[data-theme-value]')
+          if (themeButton) {
+            setTheme(themeButton.dataset.themeValue)
+            return
+          }
+
+          const modeButton = event.target.closest('[data-mode-value]')
+          if (modeButton) {
+            setMode(modeButton.dataset.modeValue)
+          }
+        })
+
+        media.addEventListener('change', (event) => {
+          if ((doc.dataset.modePreference || 'system') === 'system')
+            doc.dataset.mode = event.matches ? 'dark' : 'light'
+        })
+
+        updateButtons()
+      })()
+    </script>
   </body>
 </html>

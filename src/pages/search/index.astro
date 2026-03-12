@@ -1,14 +1,18 @@
 ---
 import List from '../../components/list.astro'
 import { getChannelInfo } from '../../lib/telegram'
+import { getUiLabels } from '../../lib/i18n'
 
-const q = Astro.url.searchParams.get('q') || decodeURIComponent(Astro.params.q || '')
-const channel = await getChannelInfo(Astro, {
-  q,
-})
+const q = Astro.url.searchParams.get('q') || ''
+const labels = getUiLabels(Astro)
+const channel = await getChannelInfo(Astro, q ? { q } : {})
+
+if (!q) {
+  channel.posts = []
+}
 
 channel.seo = {
-  title: `${q}`,
+  title: q || labels.search,
   noindex: true,
 }
 ---

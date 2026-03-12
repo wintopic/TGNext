@@ -3,6 +3,8 @@ import flourite from 'flourite'
 import { LRUCache } from 'lru-cache'
 import { $fetch } from 'ofetch'
 import { getEnv } from '../env'
+import { normalizeKeywords, isPostFiltered } from '../filters'
+import { getChannelSetting, getFilterKeywordsSetting } from '../settings'
 import prism from '../prism'
 
 const cache = new LRUCache({
@@ -271,7 +273,10 @@ async function getPost($, item, { channel, staticProxy, index = 0, reactionsEnab
 const unnessaryHeaders = ['host', 'cookie', 'origin', 'referer']
 
 export async function getChannelInfo(Astro, { before = '', after = '', q = '', type = 'list', id = '' } = {}) {
-  const cacheKey = JSON.stringify({ before, after, q, type, id })
+  const { value: channel } = getChannelSetting(Astro)
+  const { value: filterKeywordsRaw } = getFilterKeywordsSetting(Astro)
+  const filterKeywords = normalizeKeywords(filterKeywordsRaw)
+  const cacheKey = JSON.stringify({ before, after, q, type, id, channel, filter: filterKeywordsRaw })
   const cachedResult = cache.get(cacheKey)
 
   if (cachedResult) {
@@ -281,7 +286,6 @@ export async function getChannelInfo(Astro, { before = '', after = '', q = '', t
 
   // Where t.me can also be telegram.me, telegram.dog
   const host = getEnv(import.meta.env, Astro, 'TELEGRAM_HOST') ?? 't.me'
-  const channel = getEnv(import.meta.env, Astro, 'CHANNEL')
   const staticProxy = getEnv(import.meta.env, Astro, 'STATIC_PROXY') ?? '/static/'
   const reactionsEnabled = getEnv(import.meta.env, Astro, 'REACTIONS')
 
@@ -309,6 +313,11 @@ export async function getChannelInfo(Astro, { before = '', after = '', q = '', t
   const $ = cheerio.load(html, {}, false)
   if (id) {
     const post = await getPost($, null, { channel, staticProxy, reactionsEnabled })
+    if (isPostFiltered(post, filterKeywords)) {
+      const filteredPost = { id, filtered: true }
+      cache.set(cacheKey, filteredPost)
+      return filteredPost
+    }
     cache.set(cacheKey, post)
     return post
   }
@@ -317,6 +326,7 @@ export async function getChannelInfo(Astro, { before = '', after = '', q = '', t
       return getPost($, item, { channel, staticProxy, index, reactionsEnabled })
     })?.get() ?? [],
   ))?.reverse().filter(post => ['text'].includes(post.type) && post.id && post.content)
+    .filter(post => !isPostFiltered(post, filterKeywords))
 
   const channelInfo = {
     posts,

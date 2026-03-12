@@ -3,10 +3,13 @@ export async function onRequest(context, next) {
   context.locals.RSS_URL = `${context.locals.SITE_URL}rss.xml`
   context.locals.RSS_PREFIX = ''
 
-  if (context.url.pathname.startsWith('/search') && context.params.q?.startsWith('#')) {
-    const tag = context.params.q.replace('#', '')
-    context.locals.RSS_URL = `${context.locals.SITE_URL}rss.xml?tag=${tag}`
-    context.locals.RSS_PREFIX = `${tag} | `
+  if (context.url.pathname.startsWith('/search')) {
+    const searchParam = context.url.searchParams.get('q') || context.params.q || ''
+    if (searchParam.startsWith('#')) {
+      const tag = searchParam.replace('#', '')
+      context.locals.RSS_URL = `${context.locals.SITE_URL}rss.xml?tag=${tag}`
+      context.locals.RSS_PREFIX = `${tag} | `
+    }
   }
 
   const response = await next()

@@ -2,29 +2,77 @@
 import Layout from '../layouts/base.astro'
 import Header from '../components/header.astro'
 import Item from '../components/item.astro'
+import { getUiLabels } from '../lib/i18n'
 
 const { SITE_URL } = Astro.locals
-const { channel, before = true, after = true, isItem = false } = Astro.props
+const { channel, before = true, after = true, isItem = false, query = null, emptyTitle, emptyHint } = Astro.props
 const posts = channel.posts ?? []
+const labels = getUiLabels(Astro)
 
 const beforeCursor = posts[posts.length - 1]?.id
 const afterCursor = posts[0]?.id
 // const cursor = +Astro.params.cursor
+
+const hasSearchContext = query !== null && query !== undefined
+const searchQuery = typeof query === 'string' ? query.trim() : ''
+const isTagQuery = searchQuery.startsWith('#')
+const displayQuery = isTagQuery ? searchQuery.replace(/^#/, '') : searchQuery
+const resolvedEmptyTitle = emptyTitle
+  ?? (hasSearchContext && searchQuery ? labels.searchEmpty : hasSearchContext ? labels.search : labels.noPosts)
+const resolvedEmptyHint = emptyHint ?? (hasSearchContext && !searchQuery ? labels.searchTip : '')
 ---
 
 <Layout channel={channel} id="main-container">
   <slot name="header">
     <Header channel={channel} />
   </slot>
-  <div class="items">
-    {posts.map((post) => <Item post={post} isItem={isItem} />)}
-  </div>
+  {
+    hasSearchContext && (
+      <div class="search-header">
+        <div>
+          <div class="search-title">{isTagQuery ? labels.tagResults : labels.searchResults}</div>
+          {searchQuery
+            ? (
+                <div class="search-query">
+                  <span class="search-query-label">{labels.search}</span>
+                  <span class="search-query-value">{displayQuery}</span>
+                </div>
+              )
+            : (
+                <div class="search-query search-query-empty">{labels.searchPlaceholder}</div>
+              )}
+        </div>
+        <div class="search-meta">
+          {searchQuery ? `${posts.length} · ${labels.searchResults}` : labels.searchTip}
+        </div>
+        <div class="search-actions">
+          <a href="/search" class="ghost-button">{labels.clear}</a>
+          <a href={SITE_URL} class="ghost-button">{labels.back}</a>
+        </div>
+      </div>
+    )
+  }
+
+  {
+    posts.length > 0
+      ? (
+          <div class="items">
+            {posts.map((post) => <Item post={post} isItem={isItem} />)}
+          </div>
+        )
+      : (
+          <div class="empty-state">
+            <div class="empty-title">{resolvedEmptyTitle}</div>
+            {(resolvedEmptyHint ?? '').length > 0 && <div class="empty-hint">{resolvedEmptyHint}</div>}
+          </div>
+        )
+  }
 
   <div class="pages-container">
     {
       before && beforeCursor > 1 ? (
-        <a href={`${SITE_URL}before/${beforeCursor}`} title="Before" class="page">
-          Before
+        <a href={`${SITE_URL}before/${beforeCursor}`} title={labels.before} class="page">
+          {labels.before}
         </a>
       ) : (
         <span class="page-placeholder">&nbsp;</span>
@@ -34,8 +82,8 @@ const afterCursor = posts[0]?.id
     <div class="pages-info"></div>
     {
       after && afterCursor ? (
-        <a href={`${SITE_URL}after/${afterCursor}`} title="After" class="page">
-          After
+        <a href={`${SITE_URL}after/${afterCursor}`} title={labels.after} class="page">
+          {labels.after}
         </a>
       ) : (
         <span class="page-placeholder">&nbsp;</span>

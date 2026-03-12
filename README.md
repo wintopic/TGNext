@@ -1,4 +1,4 @@
-# BroadcastChannel
+# TGNext
 
 **Turn your Telegram Channel into a MicroBlog.**
 
@@ -10,52 +10,23 @@ English | [简体中文](./README.zh-cn.md)
 
 - **Turn your Telegram Channel into a MicroBlog**
 - **SEO friendly** `/sitemap.xml`
-- **0 JS on the browser side**
+- **Minimal JS on the browser side** (theme switch + optional highlight)
 - **RSS and RSS JSON** `/rss.xml` `/rss.json`
+- **Themes** 3 presets + dark mode
+- **Keyword filters** via env + settings page
 
 ## 🪧 Demo
 
-### Real users
-
-- [面条实验室](https://memo.miantiao.me/)
-- [Find Blog👁发现博客](https://broadcastchannel.pages.dev/)
-- [Memos 广场 🎪](https://now.memobbs.app/)
-- [APPDO 数字生活指南](https://mini.appdo.xyz/)
-- [85.60×53.98卡粉订阅/提醒](https://tg.docofcard.com/)
-- [新闻在花频道](https://tg.istore.app/)
-- [ALL About RSS](https://blog.rss.tips/)
-- [Charles Chin's Whisper](https://memo.eallion.com/)
-- [PlayStation 新闻转发](https://playstationnews.pages.dev)
-- [Yu's Life](https://daily.pseudoyu.com/)
-- [Leslie 和朋友们](https://tg.imlg.co/)
-- [OKHK 分享](https://tg.okhk.net/)
-- [gledos 的微型博客](https://microblogging.gledos.science)
-- [Steve Studio](https://tgc.surgeee.me/)
-- [LiFePO4:沙雕吐槽](https://lifepo4.top)
-- [Hotspot Hourly](https://hourly.top/)
-- [大河马中文财经新闻分享](https://a.xiaomi318.com/)
-- [\_My. Tricks 🎩 Collection](https://channel.mykeyvans.com)
-- [小报童专栏精选](https://xiaobaotong.genaiprism.site/)
-- [Fake news](https://fake-news.csgo.ovh/)
-- [miyi23's Geekhub资源分享](https://gh.miyi23.top/)
-- [Magazine｜期刊杂志｜财新周刊](https://themagazine.top)
-- [Remote Jobs & Cooperation](https://share-remote-jobs.vercel.app/)
-- [甬哥侃侃侃--频道发布](https://ygkkktg.pages.dev)
-- [Fugoou.log](https://fugoou.xyz)
-- [Bboysoul的博客](https://tg.bboy.app/)
-- [MakerHunter](https://share.makerhunter.com/)
-- [ChatGPT/AI新闻聚合](https://g4f.icu/)
-- [Abner's memos](https://memos.abnerz6.top/)
-- [Appinn Talk](https://talk.appinn.net/)
-- [小报童优惠与排行榜](https://youhui.xiaobaoto.com/)
+- Deploy your own TGNext on Cloudflare Pages, Netlify, or Vercel.
+- Want your public deployment listed here? Open a PR.
 
 ### Platform
 
-1. [Cloudflare](https://broadcast-channel.pages.dev/)
-2. [Netlify](https://broadcast-channel.netlify.app/)
-3. [Vercel](https://broadcast-channel.vercel.app/)
+- Cloudflare Pages (recommended)
+- Netlify
+- Vercel
 
-BroadcastChannel supports deployment on serverless platforms like Cloudflare, Netlify, Vercel that support Node.js SSR, or on a VPS.
+TGNext supports deployment on serverless platforms like Cloudflare, Netlify, Vercel that support Node.js SSR, or on a VPS.
 For detailed tutorials, see [Deploy your Astro site](https://docs.astro.build/en/guides/deploy/).
 
 ## 🧱 Tech Stack
@@ -64,18 +35,25 @@ For detailed tutorials, see [Deploy your Astro site](https://docs.astro.build/en
 - CMS: [Telegram Channels](https://telegram.org/tour/channels)
 - Template: [Sepia](https://github.com/Planetable/SiteTemplateSepia)
 
+## 🙏 Credits
+
+TGNext is a fork of [BroadcastChannel](https://github.com/miantiao-me/BroadcastChannel).
+
 ## 🏗️ Deployment
 
 ### Docker
 
-1. `docker pull ghcr.io/miantiao-me/broadcastchannel:main`
-2. `docker run -d --name broadcastchannel -p 4321:4321 -e CHANNEL=miantiao_me ghcr.io/miantiao-me/broadcastchannel:main`
+1. `docker build -t tgnext .`
+2. `docker run -d --name tgnext -p 4321:4321 -e CHANNEL=your_channel tgnext`
+
+If you enable the included GitHub Actions workflow, images will be published to:
+`ghcr.io/<owner>/tgnext:main`
 
 ### Serverless
 
-1. [Fork](https://github.com/miantiao-me/BroadcastChannel/fork) this project to your GitHub
+1. Fork this project to your GitHub (or use it as a template)
 2. Create a project on Cloudflare/Netlify/Vercel
-3. Select the `BroadcastChannel` project and the `Astro` framework
+3. Select the `TGNext` project and the `Astro` framework
 4. Configure the environment variable `CHANNEL` with your channel name. This is the minimal configuration, for more configurations see the options below
 5. Save and deploy
 6. Bind a domain (optional).
@@ -85,16 +63,16 @@ For detailed tutorials, see [Deploy your Astro site](https://docs.astro.build/en
 
 ```env
 ## Telegram Channel Username, must be configured. The string of characters following t.me/
-CHANNEL=miantiao_me
+CHANNEL=your_channel
 
 ## Language and timezone settings, language options see [dayjs](https://github.com/iamkun/dayjs/tree/dev/src/locale)
 LOCALE=en
 TIMEZONE=America/New_York
 
 ## Social media usernames
-TELEGRAM=miantiao-me
-TWITTER=miantiao-me
-GITHUB=miantiao-me
+TELEGRAM=your_telegram
+TWITTER=your_twitter
+GITHUB=your_github
 MASTODON=mastodon.social/@Mastodon
 BLUESKY=bsky.app
 
@@ -119,14 +97,17 @@ SENTRY_DSN=SENTRY_DSN
 SENTRY_PROJECT=SENTRY_PROJECT
 
 ## Telegram host name and static resource proxy, not recommended to modify
-HOST=telegram.dog
+TELEGRAM_HOST=telegram.dog
 STATIC_PROXY=
 
 ## Enable Google Site Search
-GOOGLE_SEARCH_SITE=memo.miantiao.me
+GOOGLE_SEARCH_SITE=your-domain.com
 
 ## Enable tags page, separate tags with commas
 TAGS=tag1,tag2,tag3
+
+## Filter posts by keywords (comma/semicolon/newline separated)
+FILTER_KEYWORDS=keyword1,keyword2,keyword3
 
 ## Show comments
 COMMENTS=true
@@ -153,8 +134,6 @@ RSS_BEAUTIFY=true
    - Redeploy after modifying environment variables
    - Telegram blocks public display of some sensitive channels, you can verify by visiting `https://t.me/s/channelusername`.
 
-## ☕ Sponsor
+## 🤝 Support
 
-1. [Follow me on Telegram](https://t.me/miantiao_me)
-2. [Follow me on 𝕏](https://404.li/kai)
-3. [Sponsor me on GitHub](https://github.com/sponsors/miantiao-me)
+If TGNext helps you, please consider starring the repo and sharing it with others.

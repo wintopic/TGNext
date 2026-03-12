@@ -1,8 +1,17 @@
 {
-  "name": "broadcast-channel",
+  "name": "tgnext",
   "type": "module",
   "version": "0.1.8",
   "private": true,
+  "license": "AGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wintopic/TGNext.git"
+  },
+  "homepage": "https://github.com/wintopic/TGNext#readme",
+  "bugs": {
+    "url": "https://github.com/wintopic/TGNext/issues"
+  },
   "packageManager": "pnpm@10.27.0",
   "scripts": {
     "dev": "astro dev",

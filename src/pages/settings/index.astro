@@ -1,0 +1,61 @@
+---
+import Layout from '../../layouts/base.astro'
+import Header from '../../components/header.astro'
+import { getChannelInfo } from '../../lib/telegram'
+import { getUiLabels } from '../../lib/i18n'
+import { getChannelSetting, getFilterKeywordsSetting } from '../../lib/settings'
+
+const channel = await getChannelInfo(Astro)
+const labels = getUiLabels(Astro)
+
+channel.seo = {
+  title: labels.settingsTitle,
+  noindex: true,
+}
+
+const channelSetting = getChannelSetting(Astro)
+const filterSetting = getFilterKeywordsSetting(Astro)
+const channelLocked = channelSetting.source === 'env'
+const filterLocked = filterSetting.source === 'env'
+const saved = Astro.url.searchParams.get('saved') === '1'
+---
+
+<Layout channel={channel}>
+  <slot name="header">
+    <Header channel={channel} />
+  </slot>
+
+  <div class="section-title">{labels.settingsTitle}</div>
+
+  {saved && <div class="notice">{labels.save} ✔</div>}
+
+  <form class="settings-form" action="/settings/save" method="post">
+    <div class="form-field">
+      <label class="form-label" for="channel-input">{labels.channel}</label>
+      <input
+        id="channel-input"
+        name="channel"
+        type="text"
+        value={channelSetting.value}
+        placeholder={labels.channelPlaceholder}
+        disabled={channelLocked}
+      />
+      {channelLocked && <div class="form-hint">{labels.controlledByEnv}</div>}
+    </div>
+
+    <div class="form-field">
+      <label class="form-label" for="keywords-input">{labels.keywords}</label>
+      <textarea
+        id="keywords-input"
+        name="keywords"
+        rows="4"
+        placeholder={labels.keywordsPlaceholder}
+        disabled={filterLocked}
+      >{filterSetting.value}</textarea>
+      {filterLocked && <div class="form-hint">{labels.controlledByEnv}</div>}
+      <div class="form-hint">{labels.keywordsHint}</div>
+    </div>
+
+    <button class="primary-button" type="submit">{labels.save}</button>
+  </form>
+</Layout>
