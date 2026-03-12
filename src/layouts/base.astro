@@ -213,7 +213,12 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
             }
           </nav>
 
-          <form class="search-form search-form-inline topbar-search" action={searchAction} method="get">
+          <form
+            class="search-form search-form-inline topbar-search"
+            action={searchAction}
+            method="get"
+            data-search-form
+          >
             {GOOGLE_SEARCH_SITE ? <input type="hidden" name="as_sitesearch" value={GOOGLE_SEARCH_SITE} /> : null}
             <label class="search-label" for="search-input">{labels.search}</label>
             <div class="search-input-wrap">
@@ -224,7 +229,7 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
                 placeholder={labels.searchPlaceholder}
                 defaultValue={currentQuery}
               />
-              <button type="submit" class="icon-button" aria-label={labels.search}>
+              <button type="submit" class="icon-button search-submit" aria-label={labels.search}>
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     d="M15.5 15.5L20 20M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
@@ -236,6 +241,17 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
                 </svg>
               </button>
             </div>
+            <button type="button" class="icon-button search-trigger" aria-label={labels.search}>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M15.5 15.5L20 20M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg>
+            </button>
           </form>
         </div>
       </header>
@@ -353,7 +369,10 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
         const doc = document.documentElement
         const modeButtons = document.querySelectorAll('[data-mode-value]')
         const layoutButtons = document.querySelectorAll('[data-layout-value]')
+        const searchForm = document.querySelector('[data-search-form]')
+        const searchInput = document.querySelector('#search-input')
         const media = window.matchMedia('(prefers-color-scheme: dark)')
+        const mobileQuery = window.matchMedia('(max-width: 560px)')
 
         function resolveMode(modePreference) {
           if (modePreference === 'system') {
@@ -388,6 +407,12 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
           updateButtons()
         }
 
+        function updateSearchMode() {
+          if (!searchForm)
+            return
+          searchForm.dataset.collapsed = mobileQuery.matches ? 'true' : 'false'
+        }
+
         document.addEventListener('click', (event) => {
           const modeButton = event.target.closest('[data-mode-value]')
           if (modeButton) {
@@ -406,6 +431,35 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
             doc.dataset.mode = event.matches ? 'dark' : 'light'
           }
         })
+
+        if (mobileQuery) {
+          mobileQuery.addEventListener('change', updateSearchMode)
+          updateSearchMode()
+        }
+
+        if (searchForm) {
+          searchForm.addEventListener('click', (event) => {
+            if (searchForm.dataset.collapsed !== 'true')
+              return
+            const trigger = event.target.closest('.search-trigger')
+            if (!trigger)
+              return
+            event.preventDefault()
+            event.stopPropagation()
+            searchForm.dataset.collapsed = 'false'
+            requestAnimationFrame(() => {
+              searchInput?.focus()
+            })
+          })
+
+          document.addEventListener('click', (event) => {
+            if (searchForm.dataset.collapsed === 'true')
+              return
+            if (searchForm.contains(event.target))
+              return
+            searchForm.dataset.collapsed = mobileQuery.matches ? 'true' : 'false'
+          })
+        }
 
         updateButtons()
       })()

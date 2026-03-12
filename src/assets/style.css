@@ -289,6 +289,9 @@ html[data-tabbar='true'] .app-shell {
   flex: 0 1 280px;
   min-width: 200px;
   max-width: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .main {
@@ -474,6 +477,30 @@ html[data-tabbar='true'] .app-shell {
   max-width: none;
   margin-left: 0;
   width: 100%;
+}
+
+.topbar-search .search-trigger {
+  display: none;
+}
+
+@media screen and (max-width: 560px) {
+  .topbar-search[data-collapsed='true'] {
+    flex-basis: auto;
+    min-width: auto;
+    max-width: none;
+  }
+
+  .topbar-search[data-collapsed='true'] .search-input-wrap {
+    display: none;
+  }
+
+  .topbar-search[data-collapsed='true'] .search-trigger {
+    display: inline-flex;
+  }
+
+  .topbar-search[data-collapsed='false'] .search-trigger {
+    display: none;
+  }
 }
 
 .icon-button {
