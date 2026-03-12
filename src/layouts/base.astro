@@ -18,6 +18,13 @@ const channelList = channelOptions.list
 const currentChannel = channelOptions.current
 const currentChannelKey = currentChannel?.toLowerCase() ?? ''
 const canSwitchChannel = channelList.length > 1 && channelSetting.source !== 'env'
+const orderedChannels = currentChannel
+  ? [currentChannel, ...channelList.filter((name) => name.toLowerCase() !== currentChannelKey)]
+  : [...channelList]
+const visibleChannels = orderedChannels.slice(0, 3)
+const overflowChannels = orderedChannels.slice(3)
+const showTabbar = canSwitchChannel && orderedChannels.length > 1
+const redirectValue = `${Astro.url.pathname}${Astro.url.search}`
 
 const locale = 'zh-CN'
 
@@ -100,7 +107,14 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
 ---
 
 <!doctype html>
-<html lang={locale} data-theme="mono" data-mode="light" data-mode-preference="system" data-layout="card">
+<html
+  lang={locale}
+  data-theme="mono"
+  data-mode="light"
+  data-mode-preference="system"
+  data-layout="card"
+  data-tabbar={showTabbar ? 'true' : 'false'}
+>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -140,7 +154,7 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
 
   <body id="top">
     <div class="app-shell">
-      <header class="topbar">
+      <header class="topbar glass-bar">
         <div class="topbar-content">
           <div class="topbar-brand">
             <a class="brand" href={SITE_URL} title="TGNext">TGNext</a>
@@ -199,47 +213,30 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
             }
           </nav>
 
-          <div class="topbar-tools">
-            {canSwitchChannel && (
-              <form class="quick-switch" action="/settings/switch" method="post">
-                <label class="quick-switch-label" for="quick-channel">{labels.quickSwitch}</label>
-                <select id="quick-channel" name="channel" class="select-input">
-                  {channelList.map((name) => (
-                    <option value={name} selected={name.toLowerCase() === currentChannelKey}>
-                      {name}
-                    </option>
-                  ))}
-                </select>
-                <input type="hidden" name="redirect" value={`${Astro.url.pathname}${Astro.url.search}`} />
-                <button class="ghost-button" type="submit">{labels.switch}</button>
-              </form>
-            )}
-
-            <form class="search-form search-form-inline topbar-search" action={searchAction} method="get">
-              {GOOGLE_SEARCH_SITE ? <input type="hidden" name="as_sitesearch" value={GOOGLE_SEARCH_SITE} /> : null}
-              <label class="search-label" for="search-input">{labels.search}</label>
-              <div class="search-input-wrap">
-                <input
-                  id="search-input"
-                  type="text"
-                  name="q"
-                  placeholder={labels.searchPlaceholder}
-                  defaultValue={currentQuery}
-                />
-                <button type="submit" class="icon-button" aria-label={labels.search}>
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path
-                      d="M15.5 15.5L20 20M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.6"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"></path>
-                  </svg>
-                </button>
-              </div>
-            </form>
-          </div>
+          <form class="search-form search-form-inline topbar-search" action={searchAction} method="get">
+            {GOOGLE_SEARCH_SITE ? <input type="hidden" name="as_sitesearch" value={GOOGLE_SEARCH_SITE} /> : null}
+            <label class="search-label" for="search-input">{labels.search}</label>
+            <div class="search-input-wrap">
+              <input
+                id="search-input"
+                type="text"
+                name="q"
+                placeholder={labels.searchPlaceholder}
+                defaultValue={currentQuery}
+              />
+              <button type="submit" class="icon-button" aria-label={labels.search}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M15.5 15.5L20 20M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+                </svg>
+              </button>
+            </div>
+          </form>
         </div>
       </header>
 
@@ -279,6 +276,72 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
         <slot />
       </main>
     </div>
+
+    {
+      showTabbar && (
+        <>
+          <nav class="tabbar glass-bar" aria-label={labels.quickSwitchTitle}>
+            <form class="tabbar-content" action="/settings/switch" method="post">
+              <input type="hidden" name="redirect" value={redirectValue} />
+              {visibleChannels.map((name) => (
+                <button
+                  type="submit"
+                  name="channel"
+                  value={name}
+                  class={`tabbar-item ${name.toLowerCase() === currentChannelKey ? 'active' : ''}`}
+                >
+                  <span class="tabbar-label">{name}</span>
+                </button>
+              ))}
+              {overflowChannels.length > 0 && (
+                <button
+                  type="button"
+                  class="tabbar-item tabbar-more"
+                  popovertarget="channel-more"
+                  popovertargetaction="show"
+                  aria-label={labels.moreChannels}
+                >
+                  <span class="tabbar-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        d="M6 7.5h12M6 12h12M6 16.5h12"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      ></path>
+                    </svg>
+                  </span>
+                  <span class="tabbar-label">{labels.more}</span>
+                </button>
+              )}
+            </form>
+          </nav>
+          {overflowChannels.length > 0 && (
+            <div id="channel-more" class="tabbar-popover glass-panel" popover>
+              <div class="tabbar-popover-head">{labels.moreChannels}</div>
+              <form class="tabbar-popover-list" action="/settings/switch" method="post">
+                <input type="hidden" name="redirect" value={redirectValue} />
+                {overflowChannels.map((name) => (
+                  <button
+                    type="submit"
+                    name="channel"
+                    value={name}
+                    class={`tabbar-popover-item ${name.toLowerCase() === currentChannelKey ? 'active' : ''}`}
+                  >
+                    {name}
+                  </button>
+                ))}
+              </form>
+              <button class="tabbar-popover-close" type="button" popovertarget="channel-more" popovertargetaction="hide">
+                {labels.close}
+              </button>
+            </div>
+          )}
+        </>
+      )
+    }
 
     <a href="#top" id="back-to-top" aria-label="返回顶部">
       <img {...backToTopIcon} alt="返回顶部" />

@@ -41,6 +41,10 @@ mark {
   z-index: 1000;
 }
 
+html[data-tabbar='true'] #back-to-top {
+  bottom: calc(24px + var(--tabbar-height));
+}
+
 #back-to-top img {
   width: 18px;
   height: 18px;
