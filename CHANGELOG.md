@@ -10,3 +10,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Keyword filtering (env + settings) across site, RSS, and sitemap.
 - Added settings page for channel + filter keywords.
 - Added search index route and improved search UX.
+- Added multi-channel list and quick switch.

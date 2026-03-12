@@ -40,6 +40,7 @@ TGNext is an Astro SSR microblog that turns a Telegram channel into a searchable
 - Cloudflare Pages / Netlify / Vercel ready
 - Single monochrome theme with light/dark mode
 - 3 layouts: card / grid / masonry
+- Multi-channel list + quick switch in top bar
 - UI is Chinese-only (docs are bilingual)
 - Keyword filtering across pages, RSS, and sitemap
 
@@ -55,7 +56,7 @@ TGNext is an Astro SSR microblog that turns a Telegram channel into a searchable
 - **Minimal JS**: only mode/layout toggle + optional highlight
 - **RSS & JSON Feed**: `/rss.xml` / `/rss.json`
 - **Search & Tags**: built-in search and tag aggregation
-- **Settings Page**: channel & filter settings
+- **Settings Page**: channel, channel list, and filter settings
 
 ---
 
@@ -120,6 +121,7 @@ Copy `.env.example` to `.env`. At minimum, set `CHANNEL`.
 
 | Variable   | Description        | Example                     |
 | ---------- | ------------------ | --------------------------- |
+| `CHANNELS` | Multi-channel list | `channel1,channel2`         |
 | `TIMEZONE` | Timezone           | `America/New_York`          |
 | `TELEGRAM` | Telegram username  | `your_telegram`             |
 | `TWITTER`  | X/Twitter username | `your_twitter`              |
@@ -165,9 +167,9 @@ Copy `.env.example` to `.env`. At minimum, set `CHANNEL`.
 
 ## Settings & Priority
 
-- `/settings` lets you set **target channel** and **filter keywords**
+- `/settings` lets you set **target channel**, **channel list**, and **filter keywords**
 - Values are stored in cookies
-- If `CHANNEL` / `FILTER_KEYWORDS` are set in env, they take precedence
+- If `CHANNEL` / `CHANNELS` / `FILTER_KEYWORDS` are set in env, they take precedence
 - Switch **mode** and **layout** in settings
 
 ---

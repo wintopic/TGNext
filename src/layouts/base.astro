@@ -5,12 +5,19 @@ import '../assets/global.css'
 import { SEO } from 'astro-seo'
 import { getEnv } from '../lib/env'
 import { getUiLabels } from '../lib/i18n'
+import { getChannelOptions, getChannelSetting } from '../lib/settings'
 import backToTopIcon from '../assets/back-to-top.svg'
 
 const { SITE_URL, RSS_URL, RSS_PREFIX } = Astro.locals
 const { channel } = Astro.props
 
 const labels = getUiLabels(Astro)
+const channelSetting = getChannelSetting(Astro)
+const channelOptions = getChannelOptions(Astro)
+const channelList = channelOptions.list
+const currentChannel = channelOptions.current
+const currentChannelKey = currentChannel?.toLowerCase() ?? ''
+const canSwitchChannel = channelList.length > 1 && channelSetting.source !== 'env'
 
 const locale = 'zh-CN'
 
@@ -192,30 +199,47 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
             }
           </nav>
 
-          <form class="search-form search-form-inline topbar-search" action={searchAction} method="get">
-            {GOOGLE_SEARCH_SITE ? <input type="hidden" name="as_sitesearch" value={GOOGLE_SEARCH_SITE} /> : null}
-            <label class="search-label" for="search-input">{labels.search}</label>
-            <div class="search-input-wrap">
-              <input
-                id="search-input"
-                type="text"
-                name="q"
-                placeholder={labels.searchPlaceholder}
-                defaultValue={currentQuery}
-              />
-              <button type="submit" class="icon-button" aria-label={labels.search}>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    d="M15.5 15.5L20 20M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.6"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"></path>
-                </svg>
-              </button>
-            </div>
-          </form>
+          <div class="topbar-tools">
+            {canSwitchChannel && (
+              <form class="quick-switch" action="/settings/switch" method="post">
+                <label class="quick-switch-label" for="quick-channel">{labels.quickSwitch}</label>
+                <select id="quick-channel" name="channel" class="select-input">
+                  {channelList.map((name) => (
+                    <option value={name} selected={name.toLowerCase() === currentChannelKey}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+                <input type="hidden" name="redirect" value={`${Astro.url.pathname}${Astro.url.search}`} />
+                <button class="ghost-button" type="submit">{labels.switch}</button>
+              </form>
+            )}
+
+            <form class="search-form search-form-inline topbar-search" action={searchAction} method="get">
+              {GOOGLE_SEARCH_SITE ? <input type="hidden" name="as_sitesearch" value={GOOGLE_SEARCH_SITE} /> : null}
+              <label class="search-label" for="search-input">{labels.search}</label>
+              <div class="search-input-wrap">
+                <input
+                  id="search-input"
+                  type="text"
+                  name="q"
+                  placeholder={labels.searchPlaceholder}
+                  defaultValue={currentQuery}
+                />
+                <button type="submit" class="icon-button" aria-label={labels.search}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M15.5 15.5L20 20M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"></path>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </header>
 

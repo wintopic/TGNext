@@ -237,8 +237,15 @@ hr {
   justify-content: center;
 }
 
+.topbar-tools {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
 .topbar-search {
-  justify-self: end;
+  width: 100%;
 }
 
 .main {
@@ -417,6 +424,47 @@ hr {
 .topbar-search .search-input-wrap {
   max-width: 320px;
   margin-left: auto;
+}
+
+.quick-switch {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.quick-switch-label {
+  font-size: 12px;
+  color: var(--text-soft);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.select-input {
+  appearance: none;
+  border: var(--card-border-width) var(--card-border-style) var(--border);
+  border-radius: var(--input-radius);
+  background-color: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  padding: 6px 28px 6px 12px;
+  line-height: 1.4;
+  cursor: pointer;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text-soft) 50%),
+    linear-gradient(135deg, var(--text-soft) 50%, transparent 50%);
+  background-position: calc(100% - 16px) 55%, calc(100% - 11px) 55%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  transition: border var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+}
+
+.select-input:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
 .icon-button {
@@ -1239,9 +1287,26 @@ html[data-layout='masonry'] .item:hover {
     justify-content: flex-start;
   }
 
+  .topbar-tools {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .quick-switch {
+    justify-content: flex-start;
+  }
+
+  .select-input {
+    width: 100%;
+  }
+
   .topbar-search {
     justify-self: stretch;
     width: 100%;
+  }
+
+  .topbar-search .search-input-wrap {
+    max-width: none;
   }
 
   .main {

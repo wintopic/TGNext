@@ -40,6 +40,7 @@ TGNext 是一个基于 Astro SSR 的轻量化站点生成器，直接把 Telegra
 - 支持 Cloudflare Pages / Netlify / Vercel
 - 单一黑白风格，支持深浅模式
 - 支持三种布局：卡片流 / 双排卡片流 / 瀑布流
+- 多频道列表 + 顶部快速切换
 - UI 固定中文（文档提供中英双语）
 - 关键词过滤贯穿列表、详情、RSS、Sitemap
 
@@ -55,7 +56,7 @@ TGNext 是一个基于 Astro SSR 的轻量化站点生成器，直接把 Telegra
 - **最小化 JS**：仅深浅模式/布局切换与可选高亮
 - **RSS 与 RSS JSON**：`/rss.xml` / `/rss.json`
 - **搜索 + 标签**：独立搜索页与标签聚合页
-- **设置页**：支持设置目标频道与过滤关键词
+- **设置页**：支持设置目标频道、频道列表与过滤关键词
 
 ---
 
@@ -120,6 +121,7 @@ SERVER_ADAPTER=cloudflare_pages pnpm build
 
 | 变量       | 说明             | 示例                        |
 | ---------- | ---------------- | --------------------------- |
+| `CHANNELS` | 多频道列表       | `channel1,channel2`         |
 | `TIMEZONE` | 时区             | `Asia/Shanghai`             |
 | `TELEGRAM` | Telegram 用户名  | `your_telegram`             |
 | `TWITTER`  | X/Twitter 用户名 | `your_twitter`              |
@@ -165,9 +167,9 @@ SERVER_ADAPTER=cloudflare_pages pnpm build
 
 ## 设置页与优先级
 
-- 访问 `/settings` 可设置 **目标频道** 与 **过滤关键词**
+- 访问 `/settings` 可设置 **目标频道**、**频道列表** 与 **过滤关键词**
 - 设置结果保存在 Cookie 中
-- 若环境变量 `CHANNEL` / `FILTER_KEYWORDS` 已配置，则优先生效
+- 若环境变量 `CHANNEL` / `CHANNELS` / `FILTER_KEYWORDS` 已配置，则优先生效
 - 可在设置页切换 **深浅模式** 与 **内容布局**
 
 ---
