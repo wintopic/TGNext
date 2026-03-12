@@ -93,7 +93,7 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
 ---
 
 <!doctype html>
-<html lang={locale} data-theme="x" data-mode="light" data-mode-preference="system">
+<html lang={locale} data-theme="x" data-mode="light" data-mode-preference="system" data-layout="flow">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -108,15 +108,19 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
       ;(() => {
         const doc = document.documentElement
         const allowedThemes = ['x', 'anzhiyu', 'endfield', 'discourse', 'obsidian']
+        const allowedLayouts = ['flow', 'normal']
         const storedThemeRaw = localStorage.getItem('tgnext-theme')
         const storedTheme = allowedThemes.includes(storedThemeRaw) ? storedThemeRaw : 'x'
         const storedMode = localStorage.getItem('tgnext-mode') || 'system'
+        const storedLayoutRaw = localStorage.getItem('tgnext-layout')
+        const storedLayout = allowedLayouts.includes(storedLayoutRaw) ? storedLayoutRaw : 'flow'
         const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
         const resolvedMode = storedMode === 'system' ? (systemDark ? 'dark' : 'light') : storedMode
 
         doc.dataset.theme = storedTheme
         doc.dataset.mode = resolvedMode
         doc.dataset.modePreference = storedMode
+        doc.dataset.layout = storedLayout
       })()
     </script>
     <SEO
@@ -133,108 +137,89 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
 
   <body id="top">
     <div class="app-shell">
-      <div class="app-grid">
-        <aside class="nav-rail">
-          <div class="nav-brand">
+      <header class="topbar">
+        <div class="topbar-content">
+          <div class="topbar-brand">
             <a class="brand" href={SITE_URL} title="TGNext">TGNext</a>
             <div class="brand-subtitle">{channel?.title}</div>
           </div>
 
-          <div class="nav-section">
-            <div class="nav-title">{labels.navTitle}</div>
-            <nav class="nav-list" aria-label="Primary">
-              <a href={SITE_URL} title={labels.home} class={`nav-link ${pathname === '/' ? 'current' : ''}`}>
-                {labels.home}
-              </a>
-              {
-                TAGS ? (
-                  <a
-                    href={`${SITE_URL}tags`}
-                    title={labels.tags}
-                    class={`nav-link ${pathname === '/tags' ? 'current' : ''}`}
-                  >
-                    {labels.tags}
-                  </a>
-                ) : null
-              }
-              {
-                LINKS ? (
-                  <a
-                    href={`${SITE_URL}links`}
-                    title={labels.links}
-                    class={`nav-link ${pathname === '/links' ? 'current' : ''}`}
-                  >
-                    {labels.links}
-                  </a>
-                ) : null
-              }
-              <a
-                href={`${SITE_URL}settings`}
-                title={labels.settings}
-                class={`nav-link ${pathname === '/settings' ? 'current' : ''}`}
-              >
-                {labels.settings}
-              </a>
-            </nav>
-          </div>
+          <nav class="topbar-nav" aria-label="主导航">
+            <a href={SITE_URL} title={labels.home} class={`nav-link ${pathname === '/' ? 'current' : ''}`}>
+              {labels.home}
+            </a>
+            {
+              TAGS ? (
+                <a
+                  href={`${SITE_URL}tags`}
+                  title={labels.tags}
+                  class={`nav-link ${pathname === '/tags' ? 'current' : ''}`}
+                >
+                  {labels.tags}
+                </a>
+              ) : null
+            }
+            {
+              LINKS ? (
+                <a
+                  href={`${SITE_URL}links`}
+                  title={labels.links}
+                  class={`nav-link ${pathname === '/links' ? 'current' : ''}`}
+                >
+                  {labels.links}
+                </a>
+              ) : null
+            }
+            <a
+              href={`${SITE_URL}settings`}
+              title={labels.settings}
+              class={`nav-link ${pathname === '/settings' ? 'current' : ''}`}
+            >
+              {labels.settings}
+            </a>
+            {
+              navs.map((nav) => (
+                <a href={nav.href} title={nav.title} target="_blank" rel="noopener" class="nav-link">
+                  {nav.title}
+                </a>
+              ))
+            }
+          </nav>
 
-          {
-            navs.length > 0 && (
-              <div class="nav-section">
-                <div class="nav-title">{labels.quickTools}</div>
-                <div class="nav-list">
-                  {navs.map((nav) => (
-                    <a href={nav.href} title={nav.title} target="_blank" rel="noopener" class="nav-link">
-                      {nav.title}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )
-          }
+          <form class="search-form search-form-inline topbar-search" action={searchAction} method="get">
+            {GOOGLE_SEARCH_SITE ? <input type="hidden" name="as_sitesearch" value={GOOGLE_SEARCH_SITE} /> : null}
+            <label class="search-label" for="search-input">{labels.search}</label>
+            <div class="search-input-wrap">
+              <input
+                id="search-input"
+                type="text"
+                name="q"
+                placeholder={labels.searchPlaceholder}
+                defaultValue={currentQuery}
+              />
+              <button type="submit" class="icon-button" aria-label={labels.search}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M15.5 15.5L20 20M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      </header>
 
-          <div class="nav-footer">
-            <span>{labels.poweredBy}</span>
-            <a href="https://github.com/wintopic/TGNext" target="_blank" rel="noopener">{labels.openSource}</a>
-          </div>
-        </aside>
+      <main class="main">
+        <slot name="header" />
 
-        <main class="main">
-          <div class="main-toolbar">
-            <form class="search-form search-form-inline" action={searchAction} method="get">
-              {GOOGLE_SEARCH_SITE ? <input type="hidden" name="as_sitesearch" value={GOOGLE_SEARCH_SITE} /> : null}
-              <label class="search-label" for="search-input">{labels.search}</label>
-              <div class="search-input-wrap">
-                <input
-                  id="search-input"
-                  type="text"
-                  name="q"
-                  placeholder={labels.searchPlaceholder}
-                  defaultValue={currentQuery}
-                />
-                <button type="submit" class="icon-button" aria-label={labels.search}>
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path
-                      d="M15.5 15.5L20 20M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.6"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"></path>
-                  </svg>
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <slot name="header" />
-          <slot />
-        </main>
-
-        <aside class="side-panel">
-          {
-            tags.length > 0 && (
-              <div class="sidebar-block">
+        {(tags.length > 0 || links.length > 0 || RSS_URL) && (
+          <div class="meta-panel">
+            {tags.length > 0 && (
+              <div class="meta-section">
                 <div class="block-title">{labels.tags}</div>
                 <div class="tag-list">
                   {tags.map((tag) => (
@@ -244,12 +229,10 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
                   ))}
                 </div>
               </div>
-            )
-          }
+            )}
 
-          {
-            links.length > 0 && (
-              <div class="sidebar-block">
+            {links.length > 0 && (
+              <div class="meta-section">
                 <div class="block-title">{labels.links}</div>
                 <div class="link-list">
                   {links.map((link) => (
@@ -259,19 +242,21 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
                   ))}
                 </div>
               </div>
-            )
-          }
+            )}
 
-          <div class="sidebar-block">
-            <div class="block-title">{labels.rss}</div>
-            <div class="link-list">
-              <a href={RSS_URL} class="link-chip" target="_blank" rel="alternate" type="application/rss+xml">
-                RSS
-              </a>
+            <div class="meta-section">
+              <div class="block-title">{labels.rss}</div>
+              <div class="link-list">
+                <a href={RSS_URL} class="link-chip" target="_blank" rel="alternate" type="application/rss+xml">
+                  RSS
+                </a>
+              </div>
             </div>
           </div>
-        </aside>
-      </div>
+        )}
+
+        <slot />
+      </main>
     </div>
 
     <a href="#top" id="back-to-top" aria-label="返回顶部">
@@ -284,6 +269,7 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
         const doc = document.documentElement
         const themeButtons = document.querySelectorAll('[data-theme-value]')
         const modeButtons = document.querySelectorAll('[data-mode-value]')
+        const layoutButtons = document.querySelectorAll('[data-layout-value]')
         const media = window.matchMedia('(prefers-color-scheme: dark)')
 
         function resolveMode(modePreference) {
@@ -295,6 +281,7 @@ return media.matches ? 'dark' : 'light'
         function updateButtons() {
           const theme = doc.dataset.theme
           const modePreference = doc.dataset.modePreference || 'system'
+          const layout = doc.dataset.layout || 'flow'
 
           themeButtons.forEach((button) => {
             button.setAttribute('aria-pressed', button.dataset.themeValue === theme)
@@ -302,6 +289,10 @@ return media.matches ? 'dark' : 'light'
 
           modeButtons.forEach((button) => {
             button.setAttribute('aria-pressed', button.dataset.modeValue === modePreference)
+          })
+
+          layoutButtons.forEach((button) => {
+            button.setAttribute('aria-pressed', button.dataset.layoutValue === layout)
           })
         }
 
@@ -318,6 +309,12 @@ return media.matches ? 'dark' : 'light'
           updateButtons()
         }
 
+        function setLayout(layout) {
+          localStorage.setItem('tgnext-layout', layout)
+          doc.dataset.layout = layout
+          updateButtons()
+        }
+
         document.addEventListener('click', (event) => {
           const themeButton = event.target.closest('[data-theme-value]')
           if (themeButton) {
@@ -328,6 +325,12 @@ return media.matches ? 'dark' : 'light'
           const modeButton = event.target.closest('[data-mode-value]')
           if (modeButton) {
             setMode(modeButton.dataset.modeValue)
+            return
+          }
+
+          const layoutButton = event.target.closest('[data-layout-value]')
+          if (layoutButton) {
+            setLayout(layoutButton.dataset.layoutValue)
           }
         })
 

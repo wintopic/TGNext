@@ -99,6 +99,19 @@ const saved = Astro.url.searchParams.get('saved') === '1'
           </button>
         </div>
       </div>
+
+      <div class="form-field">
+        <div class="form-label">{labels.layout}</div>
+        <div class="form-hint">{labels.layoutHint}</div>
+        <div class="theme-switch">
+          <button class="switch-chip" type="button" data-layout-value="flow" aria-pressed="false">
+            {labels.layoutFlow}
+          </button>
+          <button class="switch-chip" type="button" data-layout-value="normal" aria-pressed="false">
+            {labels.layoutNormal}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </Layout>
