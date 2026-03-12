@@ -32,6 +32,7 @@ mark {
   background: var(--surface);
   border: var(--panel-border-width) var(--panel-border-style) var(--border);
   box-shadow: var(--panel-shadow);
+  background-image: var(--surface-texture);
   opacity: 0;
   pointer-events: none;
   transition:
