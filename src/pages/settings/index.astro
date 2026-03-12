@@ -63,28 +63,6 @@ const saved = Astro.url.searchParams.get('saved') === '1'
     <div class="section-title">{labels.appearanceTitle}</div>
     <div class="settings-card">
       <div class="form-field">
-        <div class="form-label">{labels.theme}</div>
-        <div class="form-hint">{labels.themeHint}</div>
-        <div class="theme-switch">
-          <button class="switch-chip" type="button" data-theme-value="x" aria-pressed="false">
-            {labels.themeX}
-          </button>
-          <button class="switch-chip" type="button" data-theme-value="anzhiyu" aria-pressed="false">
-            {labels.themeAnzhiyu}
-          </button>
-          <button class="switch-chip" type="button" data-theme-value="endfield" aria-pressed="false">
-            {labels.themeEndfield}
-          </button>
-          <button class="switch-chip" type="button" data-theme-value="discourse" aria-pressed="false">
-            {labels.themeDiscourse}
-          </button>
-          <button class="switch-chip" type="button" data-theme-value="obsidian" aria-pressed="false">
-            {labels.themeObsidian}
-          </button>
-        </div>
-      </div>
-
-      <div class="form-field">
         <div class="form-label">{labels.mode}</div>
         <div class="form-hint">{labels.modeHint}</div>
         <div class="theme-switch">

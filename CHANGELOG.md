@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 - TGNext rebrand and documentation refresh.
-- UI/UX redesign with three themes and dark mode.
+- UI/UX redesign with monochrome theme + light/dark mode.
 - Keyword filtering (env + settings) across site, RSS, and sitemap.
 - Added settings page for channel + filter keywords.
 - Added search index route and improved search UX.

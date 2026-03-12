@@ -93,7 +93,7 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
 ---
 
 <!doctype html>
-<html lang={locale} data-theme="x" data-mode="light" data-mode-preference="system" data-layout="card">
+<html lang={locale} data-theme="mono" data-mode="light" data-mode-preference="system" data-layout="card">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -107,17 +107,13 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
     <script is:inline>
       ;(() => {
         const doc = document.documentElement
-        const allowedThemes = ['x', 'anzhiyu', 'endfield', 'discourse', 'obsidian']
         const allowedLayouts = ['card', 'grid', 'masonry']
-        const storedThemeRaw = localStorage.getItem('tgnext-theme')
-        const storedTheme = allowedThemes.includes(storedThemeRaw) ? storedThemeRaw : 'x'
         const storedMode = localStorage.getItem('tgnext-mode') || 'system'
         const storedLayoutRaw = localStorage.getItem('tgnext-layout')
         const storedLayout = allowedLayouts.includes(storedLayoutRaw) ? storedLayoutRaw : 'card'
         const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
         const resolvedMode = storedMode === 'system' ? (systemDark ? 'dark' : 'light') : storedMode
 
-        doc.dataset.theme = storedTheme
         doc.dataset.mode = resolvedMode
         doc.dataset.modePreference = storedMode
         doc.dataset.layout = storedLayout
@@ -261,7 +257,6 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
     <script is:inline>
       ;(() => {
         const doc = document.documentElement
-        const themeButtons = document.querySelectorAll('[data-theme-value]')
         const modeButtons = document.querySelectorAll('[data-mode-value]')
         const layoutButtons = document.querySelectorAll('[data-layout-value]')
         const media = window.matchMedia('(prefers-color-scheme: dark)')
@@ -273,13 +268,8 @@ return media.matches ? 'dark' : 'light'
         }
 
         function updateButtons() {
-          const theme = doc.dataset.theme
           const modePreference = doc.dataset.modePreference || 'system'
-          const layout = doc.dataset.layout || 'flow'
-
-          themeButtons.forEach((button) => {
-            button.setAttribute('aria-pressed', button.dataset.themeValue === theme)
-          })
+          const layout = doc.dataset.layout || 'card'
 
           modeButtons.forEach((button) => {
             button.setAttribute('aria-pressed', button.dataset.modeValue === modePreference)
@@ -288,12 +278,6 @@ return media.matches ? 'dark' : 'light'
           layoutButtons.forEach((button) => {
             button.setAttribute('aria-pressed', button.dataset.layoutValue === layout)
           })
-        }
-
-        function setTheme(theme) {
-          localStorage.setItem('tgnext-theme', theme)
-          doc.dataset.theme = theme
-          updateButtons()
         }
 
         function setMode(modePreference) {
@@ -310,12 +294,6 @@ return media.matches ? 'dark' : 'light'
         }
 
         document.addEventListener('click', (event) => {
-          const themeButton = event.target.closest('[data-theme-value]')
-          if (themeButton) {
-            setTheme(themeButton.dataset.themeValue)
-            return
-          }
-
           const modeButton = event.target.closest('[data-mode-value]')
           if (modeButton) {
             setMode(modeButton.dataset.modeValue)
