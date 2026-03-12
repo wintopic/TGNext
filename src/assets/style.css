@@ -59,7 +59,7 @@
   --panel-border-width: 1px;
   --card-border-style: solid;
   --panel-border-style: solid;
-  --card-shadow: none;
+  --card-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
   --panel-shadow: var(--shadow-1);
   --divider-style: 1px solid var(--border);
   --bg-glow:
@@ -101,14 +101,14 @@ html[data-theme='mono'][data-mode='light'] {
   --panel-border-width: 1px;
   --card-border-style: solid;
   --panel-border-style: solid;
-  --card-shadow: none;
+  --card-shadow: 0 14px 32px rgba(0, 0, 0, 0.08);
   --panel-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
   --divider-style: 1px solid var(--border);
   --bg-glow: none;
   --page-texture: none;
   --surface-texture: none;
-  --glass-bg: color-mix(in srgb, var(--surface) 18%, transparent);
-  --glass-border: color-mix(in srgb, var(--border) 18%, transparent);
+  --glass-bg: color-mix(in srgb, var(--surface) 12%, transparent);
+  --glass-border: color-mix(in srgb, var(--border) 14%, transparent);
   --glass-shadow: 0 28px 60px rgba(0, 0, 0, 0.06);
   --glass-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(255, 255, 255, 0.55);
   --glass-highlight: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.75) 40%, rgba(255, 255, 255, 0.3));
@@ -153,14 +153,14 @@ html[data-theme='mono'][data-mode='dark'] {
   --panel-border-width: 1px;
   --card-border-style: solid;
   --panel-border-style: solid;
-  --card-shadow: none;
+  --card-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
   --panel-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
   --divider-style: 1px solid var(--border);
   --bg-glow: none;
   --page-texture: none;
   --surface-texture: none;
-  --glass-bg: color-mix(in srgb, var(--surface) 14%, transparent);
-  --glass-border: color-mix(in srgb, var(--border) 22%, transparent);
+  --glass-bg: color-mix(in srgb, var(--surface) 8%, transparent);
+  --glass-border: color-mix(in srgb, var(--border) 18%, transparent);
   --glass-shadow: 0 34px 72px rgba(0, 0, 0, 0.72);
   --glass-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(255, 255, 255, 0.1);
   --glass-highlight: linear-gradient(135deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.26) 40%, rgba(255, 255, 255, 0));
@@ -185,6 +185,8 @@ body {
   line-height: 1.65;
   margin: 0;
   min-height: 100vh;
+  text-rendering: optimizeLegibility;
+  text-wrap: pretty;
 }
 
 a {
@@ -364,7 +366,8 @@ html[data-tabbar='true'] .app-shell {
   transition:
     background var(--transition-fast),
     color var(--transition-fast),
-    border var(--transition-fast);
+    border var(--transition-fast),
+    transform var(--transition-fast);
 }
 
 .topbar .nav-link {
@@ -378,9 +381,13 @@ html[data-tabbar='true'] .app-shell {
 }
 
 .nav-link.current {
-  background: var(--accent);
-  color: var(--accent-contrast);
-  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.nav-link:active {
+  transform: translateY(1px);
 }
 
 .search-form {
@@ -660,16 +667,16 @@ html[data-tabbar='true'] .app-shell {
   gap: 4px;
   font-size: 12px;
   font-weight: 600;
-  background: color-mix(in srgb, var(--surface) 28%, transparent);
+  background: color-mix(in srgb, var(--surface) 18%, transparent);
   color: var(--text-soft);
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast), border var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast), border var(--transition-fast), transform var(--transition-fast);
 }
 
 .tabbar-item.active {
-  background: var(--accent);
-  color: var(--accent-contrast);
-  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
 .tabbar-item:hover {
@@ -678,7 +685,11 @@ html[data-tabbar='true'] .app-shell {
 }
 
 .tabbar-item.active:hover {
-  color: var(--accent-contrast);
+  color: var(--text);
+}
+
+.tabbar-item:active {
+  transform: translateY(1px) scale(0.98);
 }
 
 .tabbar-label {
@@ -834,6 +845,7 @@ html[data-tabbar='true'] .app-shell {
   font-size: 24px;
   font-weight: 600;
   color: var(--text);
+  text-wrap: balance;
 }
 
 .profile-badge {
@@ -896,6 +908,7 @@ html[data-tabbar='true'] .app-shell {
   font-family: var(--font-heading, 'Noto Serif SC', serif);
   padding-bottom: var(--space-2);
   border-bottom: var(--divider-style);
+  text-wrap: balance;
 }
 
 .search-header {
@@ -914,6 +927,7 @@ html[data-tabbar='true'] .app-shell {
   font-size: 18px;
   font-weight: 600;
   font-family: var(--font-heading, 'Noto Serif SC', serif);
+  text-wrap: balance;
 }
 
 .search-query {
@@ -961,11 +975,16 @@ html[data-tabbar='true'] .app-shell {
   cursor: pointer;
   transition:
     background var(--transition-fast),
-    border var(--transition-fast);
+    border var(--transition-fast),
+    transform var(--transition-fast);
 }
 
 .ghost-button:hover {
   background: var(--bg-soft);
+}
+
+.ghost-button:active {
+  transform: translateY(1px);
 }
 
 .items {
@@ -976,8 +995,8 @@ html[data-tabbar='true'] .app-shell {
 }
 
 .item {
-  background: var(--surface);
-  border: var(--card-border-width) var(--card-border-style) var(--border);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border: var(--card-border-width) var(--card-border-style) color-mix(in srgb, var(--border) 70%, transparent);
   border-radius: var(--card-radius);
   padding: var(--item-padding);
   box-shadow: var(--card-shadow);
@@ -989,9 +1008,9 @@ html[data-tabbar='true'] .app-shell {
 }
 
 .item:hover {
-  border-color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
   box-shadow: var(--panel-shadow);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 html[data-layout='card'] .main > * {
@@ -1052,6 +1071,7 @@ html[data-layout='masonry'] .item:hover {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
 }
 
 .time-box .dot {
@@ -1293,6 +1313,10 @@ html[data-layout='masonry'] .item:hover {
 .primary-button:hover {
   transform: translateY(-1px);
   background: var(--link-hover);
+}
+
+.primary-button:active {
+  transform: translateY(1px) scale(0.98);
 }
 
 .content h1,

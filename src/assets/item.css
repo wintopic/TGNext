@@ -1,5 +1,6 @@
 .content {
   word-break: break-word;
+  text-wrap: pretty;
 
   .image-list-container {
     display: grid;
@@ -36,7 +37,7 @@
 
   .tgme_widget_message_link_preview:has(.link_preview_site_name) {
     display: block;
-    background: var(--cell-background-color);
+    background: color-mix(in srgb, var(--cell-background-color) 85%, transparent);
     border-left: 3px solid var(--highlight-color);
     padding: 6px;
     padding-left: 10px;
@@ -100,7 +101,7 @@
   blockquote {
     margin: 16px 0;
     font-size: 0.8em;
-    background: var(--cell-background-color);
+    background: color-mix(in srgb, var(--cell-background-color) 85%, transparent);
     border-left: 3px solid var(--highlight-color);
     padding: 6px;
     padding-left: 10px;
@@ -110,7 +111,7 @@
   .tg-expandable {
     margin: 16px 0;
     font-size: 0.8em;
-    background: var(--cell-background-color);
+    background: color-mix(in srgb, var(--cell-background-color) 85%, transparent);
     border-left: 3px solid var(--highlight-color);
     padding: 6px;
     padding-left: 10px;
