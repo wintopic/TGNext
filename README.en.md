@@ -38,7 +38,9 @@
 TGNext is an Astro SSR microblog that turns a Telegram channel into a searchable, tag-aware, RSS-friendly site.
 
 - Cloudflare Pages / Netlify / Vercel ready
-- 3 theme presets + dark mode
+- 5 theme presets + dark mode
+- 3 layouts: card / grid / masonry
+- UI is Chinese-only (docs are bilingual)
 - Keyword filtering across pages, RSS, and sitemap
 
 > [!NOTE]
@@ -50,7 +52,7 @@ TGNext is an Astro SSR microblog that turns a Telegram channel into a searchable
 
 - **Telegram as CMS**: no backend required
 - **SEO friendly**: `/sitemap.xml` + `NO_INDEX` / `NO_FOLLOW`
-- **Minimal JS**: only theme toggle + optional highlight
+- **Minimal JS**: only theme/layout toggle + optional highlight
 - **RSS & JSON Feed**: `/rss.xml` / `/rss.json`
 - **Search & Tags**: built-in search and tag aggregation
 - **Settings Page**: channel & filter settings
@@ -118,7 +120,6 @@ Copy `.env.example` to `.env`. At minimum, set `CHANNEL`.
 
 | Variable   | Description        | Example                     |
 | ---------- | ------------------ | --------------------------- |
-| `LOCALE`   | Language           | `en`                        |
 | `TIMEZONE` | Timezone           | `America/New_York`          |
 | `TELEGRAM` | Telegram username  | `your_telegram`             |
 | `TWITTER`  | X/Twitter username | `your_twitter`              |
@@ -142,7 +143,7 @@ Copy `.env.example` to `.env`. At minimum, set `CHANNEL`.
 | `COMMENTS`           | Comments toggle                           | `true`                   |
 | `REACTIONS`          | Reactions toggle                          | `true`                   |
 | `LINKS`              | Links list                                | `Title,URL;Title2,URL2;` |
-| `NAVS`               | Sidebar nav                               | `Title,URL;Title2,URL2;` |
+| `NAVS`               | Top navigation links                      | `Title,URL;Title2,URL2;` |
 | `RSS_BEAUTIFY`       | Beautify RSS                              | `true`                   |
 | `FOOTER_INJECT`      | Footer inject                             | HTML                     |
 | `HEADER_INJECT`      | Header inject                             | HTML                     |
@@ -167,6 +168,7 @@ Copy `.env.example` to `.env`. At minimum, set `CHANNEL`.
 - `/settings` lets you set **target channel** and **filter keywords**
 - Values are stored in cookies
 - If `CHANNEL` / `FILTER_KEYWORDS` are set in env, they take precedence
+- Switch **theme**, **mode**, and **layout** in settings
 
 ---
 

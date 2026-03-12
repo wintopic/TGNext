@@ -38,7 +38,9 @@
 TGNext 是一个基于 Astro SSR 的轻量化站点生成器，直接把 Telegram 频道内容转成可订阅、可搜索、可标签化的微型博客站点。
 
 - 支持 Cloudflare Pages / Netlify / Vercel
-- 内置三套主题 + 暗黑模式
+- 内置五套主题 + 暗黑模式
+- 支持三种布局：卡片流 / 双排卡片流 / 瀑布流
+- UI 固定中文（文档提供中英双语）
 - 关键词过滤贯穿列表、详情、RSS、Sitemap
 
 > [!NOTE]
@@ -50,7 +52,7 @@ TGNext 是一个基于 Astro SSR 的轻量化站点生成器，直接把 Telegra
 
 - **Telegram 频道即 CMS**：无需后台，自动抓取频道内容
 - **SEO 友好**：`/sitemap.xml` 与 `NO_INDEX` / `NO_FOLLOW`
-- **最小化 JS**：仅主题切换与可选高亮
+- **最小化 JS**：仅主题/布局切换与可选高亮
 - **RSS 与 RSS JSON**：`/rss.xml` / `/rss.json`
 - **搜索 + 标签**：独立搜索页与标签聚合页
 - **设置页**：支持设置目标频道与过滤关键词
@@ -118,7 +120,6 @@ SERVER_ADAPTER=cloudflare_pages pnpm build
 
 | 变量       | 说明             | 示例                        |
 | ---------- | ---------------- | --------------------------- |
-| `LOCALE`   | 语言             | `zh-cn`                     |
 | `TIMEZONE` | 时区             | `Asia/Shanghai`             |
 | `TELEGRAM` | Telegram 用户名  | `your_telegram`             |
 | `TWITTER`  | X/Twitter 用户名 | `your_twitter`              |
@@ -142,7 +143,7 @@ SERVER_ADAPTER=cloudflare_pages pnpm build
 | `COMMENTS`           | 评论开关                         | `true`                   |
 | `REACTIONS`          | Reactions 开关                   | `true`                   |
 | `LINKS`              | Links 页面列表                   | `Title,URL;Title2,URL2;` |
-| `NAVS`               | 侧边栏导航                       | `Title,URL;Title2,URL2;` |
+| `NAVS`               | 顶部导航扩展                     | `Title,URL;Title2,URL2;` |
 | `RSS_BEAUTIFY`       | RSS 美化                         | `true`                   |
 | `FOOTER_INJECT`      | Footer 注入                      | HTML                     |
 | `HEADER_INJECT`      | Header 注入                      | HTML                     |
@@ -167,6 +168,7 @@ SERVER_ADAPTER=cloudflare_pages pnpm build
 - 访问 `/settings` 可设置 **目标频道** 与 **过滤关键词**
 - 设置结果保存在 Cookie 中
 - 若环境变量 `CHANNEL` / `FILTER_KEYWORDS` 已配置，则优先生效
+- 可在设置页切换 **主题**、**深浅模式** 与 **内容布局**
 
 ---
 

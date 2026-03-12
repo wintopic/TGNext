@@ -1,8 +1,6 @@
 ---
 import { getEnv } from '../lib/env'
-import { getUiLabels } from '../lib/i18n'
 import voidFile from '../assets/void.png'
-import rss from '../assets/rss.svg'
 import podcast from '../assets/podcast.svg'
 import twitter from '../assets/twitter.svg'
 import github from '../assets/github.svg'
@@ -11,10 +9,8 @@ import telegram from '../assets/telegram.svg'
 import mastodon from '../assets/mastodon.svg'
 import bluesky from '../assets/bluesky.svg'
 
-const { SITE_URL, RSS_URL } = Astro.locals
+const { SITE_URL } = Astro.locals
 const { channel } = Astro.props
-
-const labels = getUiLabels(Astro)
 
 const PODCAST = getEnv(import.meta.env, Astro, 'PODCAST') ?? getEnv(import.meta.env, Astro, 'PODCASRT')
 const TWITTER = getEnv(import.meta.env, Astro, 'TWITTER')
@@ -45,9 +41,6 @@ const hideDescription = getEnv(import.meta.env, Astro, 'HIDE_DESCRIPTION')
         <span class="profile-badge">TGNext</span>
       </div>
       <div class="profile-actions">
-        <a href={RSS_URL} target="_blank" rel="alternate" type="application/rss+xml" title={labels.rss} class="icon-button">
-          <img {...rss} alt="RSS" />
-        </a>
 
         {
           PODCAST && (
