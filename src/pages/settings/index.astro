@@ -46,18 +46,21 @@ const saved = Astro.url.searchParams.get('saved') === '1'
         data-remove-label={labels.remove}
       >
         <div class="tag-input-list">
-          {channelList.map((name) => (
-            <div class={`channel-tag ${name.toLowerCase() === currentChannelKey ? 'active' : ''}`} data-channel={name}>
-              <button
-                type="button"
-                class="channel-tag-select"
-                aria-pressed={name.toLowerCase() === currentChannelKey ? 'true' : 'false'}
-                disabled={channelLocked}
+          {
+            channelList.map((name) => (
+              <div
+                class={`channel-tag ${name.toLowerCase() === currentChannelKey ? 'active' : ''}`}
+                data-channel={name}
               >
-                {name}
-              </button>
-              {
-                !channelsLocked ? (
+                <button
+                  type="button"
+                  class="channel-tag-select"
+                  aria-pressed={name.toLowerCase() === currentChannelKey ? 'true' : 'false'}
+                  disabled={channelLocked}
+                >
+                  {name}
+                </button>
+                {!channelsLocked ? (
                   <button
                     type="button"
                     class="channel-tag-remove"
@@ -66,10 +69,10 @@ const saved = Astro.url.searchParams.get('saved') === '1'
                   >
                     ×
                   </button>
-                ) : null
-              }
-            </div>
-          ))}
+                ) : null}
+              </div>
+            ))
+          }
         </div>
         <input
           id="channels-input"
@@ -87,13 +90,7 @@ const saved = Astro.url.searchParams.get('saved') === '1'
         value={channelList.join(',')}
         disabled={channelsLocked}
       />
-      <input
-        type="hidden"
-        id="channel-current"
-        name="channel"
-        value={currentChannel}
-        disabled={channelLocked}
-      />
+      <input type="hidden" id="channel-current" name="channel" value={currentChannel} disabled={channelLocked} />
       {channelsLocked && <div class="form-hint">{labels.controlledByEnv}</div>}
       {channelLocked && <div class="form-hint">{labels.channelControlledByEnv}</div>}
       <div class="form-hint">{labels.channelsHint}</div>
@@ -157,8 +154,9 @@ const saved = Astro.url.searchParams.get('saved') === '1'
   <script is:inline>
     ;(() => {
       const wrapper = document.querySelector('[data-channel-tags]')
-      if (!wrapper)
+      if (!wrapper) {
         return
+      }
 
       const listEl = wrapper.querySelector('.tag-input-list')
       const input = wrapper.querySelector('.tag-input-field')
@@ -167,26 +165,19 @@ const saved = Astro.url.searchParams.get('saved') === '1'
       const channelLocked = wrapper.dataset.channelLocked === 'true'
       const listLocked = wrapper.dataset.listLocked === 'true'
       const removeLabel = wrapper.dataset.removeLabel || '移除'
+      if (!listEl) {
+        return
+      }
 
       const parseList = (value = '') =>
         value
-          .split(/[\n,;]+/g)
+          .split(/[\n,;]+/)
           .map((item) => item.trim())
           .filter(Boolean)
 
       let channels = parseList(hiddenChannels?.value ?? '')
       if (!channels.length && hiddenCurrent?.value) {
         channels = [hiddenCurrent.value]
-      }
-
-      const syncHidden = () => {
-        if (hiddenChannels) {
-          hiddenChannels.value = channels.join(',')
-        }
-        if (hiddenCurrent && !hiddenCurrent.value && channels.length) {
-          hiddenCurrent.value = channels[0]
-        }
-        updateActive()
       }
 
       const updateActive = () => {
@@ -204,6 +195,16 @@ const saved = Astro.url.searchParams.get('saved') === '1'
             removeButton.disabled = active
           }
         })
+      }
+
+      const syncHidden = () => {
+        if (hiddenChannels) {
+          hiddenChannels.value = channels.join(',')
+        }
+        if (hiddenCurrent && !hiddenCurrent.value && channels.length) {
+          hiddenCurrent.value = channels[0]
+        }
+        updateActive()
       }
 
       const createTag = (name) => {
@@ -234,16 +235,19 @@ const saved = Astro.url.searchParams.get('saved') === '1'
         let changed = false
         values.forEach((value) => {
           const normalized = value.trim()
-          if (!normalized)
+          if (!normalized) {
             return
-          if (channels.some((item) => item.toLowerCase() === normalized.toLowerCase()))
+          }
+          if (channels.some((item) => item.toLowerCase() === normalized.toLowerCase())) {
             return
+          }
           channels.push(normalized)
           createTag(normalized)
           changed = true
         })
-        if (changed)
+        if (changed) {
           syncHidden()
+        }
       }
 
       const removeChannel = (name) => {
@@ -255,8 +259,9 @@ const saved = Astro.url.searchParams.get('saved') === '1'
       }
 
       const setCurrent = (name) => {
-        if (channelLocked || !hiddenCurrent)
+        if (channelLocked || !hiddenCurrent) {
           return
+        }
         hiddenCurrent.value = name
         updateActive()
       }
@@ -264,11 +269,13 @@ const saved = Astro.url.searchParams.get('saved') === '1'
       if (!listLocked && input) {
         const commitInput = () => {
           const value = input.value
-          if (!value)
+          if (!value) {
             return
+          }
           const values = parseList(value)
-          if (!values.length)
+          if (!values.length) {
             return
+          }
           addChannels(values)
           input.value = ''
         }
@@ -281,8 +288,9 @@ const saved = Astro.url.searchParams.get('saved') === '1'
         })
 
         input.addEventListener('input', () => {
-          if (/[\n,;]+/.test(input.value))
+          if (/[\n,;]+/.test(input.value)) {
             commitInput()
+          }
         })
 
         input.addEventListener('blur', commitInput)
@@ -299,8 +307,9 @@ const saved = Astro.url.searchParams.get('saved') === '1'
         if (removeButton) {
           const tag = removeButton.closest('.channel-tag')
           const name = tag?.dataset.channel
-          if (!name)
+          if (!name) {
             return
+          }
           tag.remove()
           removeChannel(name)
         }

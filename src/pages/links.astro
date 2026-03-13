@@ -4,6 +4,7 @@ import Header from '../components/header.astro'
 import { getChannelInfo } from '../lib/telegram'
 import { getEnv } from '../lib/env'
 import { getUiLabels } from '../lib/i18n'
+import type { LinkItem } from '../lib/types'
 
 const channel = await getChannelInfo(Astro)
 const labels = getUiLabels(Astro)
@@ -12,16 +13,17 @@ channel.seo = {
   title: labels.links,
 }
 
-const links = (getEnv(import.meta.env, Astro, 'LINKS') || '')
+const links: LinkItem[] = (getEnv(import.meta.env, Astro, 'LINKS') || '')
   .split(';')
   .filter(Boolean)
-  .map((link) => {
-    link = link.split(',')
+  .map((link: string) => {
+    const parts = link.split(',').map((part: string) => part.trim())
     return {
-      title: link[0],
-      href: link[1],
+      title: parts[0],
+      href: parts[1],
     }
   })
+  .filter((link: LinkItem) => link.title && link.href)
 
 if (!links.length) {
   return Astro.redirect('/')

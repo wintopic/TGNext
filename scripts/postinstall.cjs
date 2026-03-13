@@ -1,16 +1,17 @@
+const { spawnSync } = require('node:child_process')
 const { existsSync } = require('node:fs')
 const path = require('node:path')
-const { spawnSync } = require('node:child_process')
+const process = require('node:process')
 
 const isWin = process.platform === 'win32'
 const pnpmCmd = isWin ? 'pnpm.cmd' : 'pnpm'
 const binExt = isWin ? '.cmd' : ''
 
-const hasBin = (name) => {
+function hasBin(name) {
   return existsSync(path.join(process.cwd(), 'node_modules', '.bin', `${name}${binExt}`))
 }
 
-const run = (args) => {
+function run(args) {
   const result = spawnSync(pnpmCmd, ['exec', ...args], { stdio: 'inherit' })
   return result.status === 0
 }

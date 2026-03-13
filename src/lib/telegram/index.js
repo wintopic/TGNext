@@ -3,9 +3,9 @@ import flourite from 'flourite'
 import { LRUCache } from 'lru-cache'
 import { $fetch } from 'ofetch'
 import { getEnv } from '../env'
-import { normalizeKeywords, isPostFiltered } from '../filters'
-import { getChannelSetting, getFilterKeywordsSetting } from '../settings'
+import { isPostFiltered, normalizeKeywords } from '../filters'
 import prism from '../prism'
+import { getChannelSetting, getFilterKeywordsSetting } from '../settings'
 
 const cache = new LRUCache({
   ttl: 1000 * 60 * 5, // 5 minutes
@@ -14,6 +14,16 @@ const cache = new LRUCache({
     return JSON.stringify(item).length
   },
 })
+
+function createEmptyChannelInfo(channel = '') {
+  return {
+    posts: [],
+    title: channel ? `@${channel}` : 'TGNext',
+    description: '',
+    descriptionHTML: '',
+    avatar: '',
+  }
+}
 
 // Normalize emoji variants (e.g., heart variants)
 function normalizeEmoji(emoji) {
@@ -33,12 +43,12 @@ function getCustomEmojiImage(emojiId, staticProxy = '') {
   return `${staticProxy}${imageUrl}`
 }
 
-async function hydrateTgEmoji($, content, { staticProxy } = {}) {
+function hydrateTgEmoji($, content, { staticProxy } = {}) {
   const emojiNodes = $(content).find('tg-emoji')?.toArray() ?? []
   if (!emojiNodes.length)
     return
 
-  await Promise.all(emojiNodes.map((emojiEl) => {
+  emojiNodes.forEach((emojiEl) => {
     const emojiId = $(emojiEl).attr('emoji-id')
     if (!emojiId)
       return
@@ -48,7 +58,7 @@ async function hydrateTgEmoji($, content, { staticProxy } = {}) {
       const imageMarkup = `<img class="tg-emoji" src="${imageUrl}" alt="" loading="lazy" />`
       $(emojiEl).replaceWith(imageMarkup)
     }
-  }))
+  })
 }
 
 function getVideoStickers($, item, { staticProxy, index }) {
@@ -74,7 +84,10 @@ function getImageStickers($, item, { staticProxy, index }) {
 
 function getImages($, item, { staticProxy, id, index, title }) {
   const images = $(item).find('.tgme_widget_message_photo_wrap')?.map((_index, photo) => {
-    const url = $(photo).attr('style').match(/url\(["'](.*?)["']/)?.[1]
+    const style = $(photo).attr('style') || ''
+    const url = style.match(/url\(["'](.*?)["']/)?.[1]
+    if (!url)
+      return null
     const popoverId = `modal-${id}-${_index}`
     return `
       <button class="image-preview-button image-preview-wrap" popovertarget="${popoverId}" popovertargetaction="show">
@@ -84,7 +97,7 @@ function getImages($, item, { staticProxy, id, index, title }) {
         <img class="modal-img" src="${staticProxy + url}" alt="${title}" loading="lazy" />
       </button>
     `
-  })?.get()
+  })?.get()?.filter(Boolean) ?? []
   return images.length ? `<div class="image-list-container ${images.length % 2 === 0 ? 'image-list-even' : 'image-list-odd'}">${images?.join('')}</div>` : ''
 }
 
@@ -132,15 +145,20 @@ function getReply($, item, { channel }) {
 
   const href = reply?.attr('href')
   if (href) {
-    const url = new URL(href)
-    reply?.attr('href', `${url.pathname}`.replace(new RegExp(`/${channel}/`, 'i'), '/posts/'))
+    try {
+      const url = new URL(href, 'https://t.me')
+      reply?.attr('href', `${url.pathname}`.replace(new RegExp(`/${channel}/`, 'i'), '/posts/'))
+    }
+    catch (error) {
+      console.warn('Normalize reply URL failed', { channel, href, error })
+    }
   }
 
   return $.html(reply)
 }
 
 async function modifyHTMLContent($, content, { index, staticProxy } = {}) {
-  await hydrateTgEmoji($, content, { staticProxy })
+  hydrateTgEmoji($, content, { staticProxy })
   $(content).find('.emoji')?.removeAttr('style')
   $(content).find('a')?.each((_index, a) => {
     $(a)?.attr('title', $(a)?.text())?.removeAttr('onclick')
@@ -257,15 +275,16 @@ async function getPost($, item, { channel, staticProxy, index = 0, reactionsEnab
       $.html($(item).find('.tgme_widget_message_video_player.not_supported')),
       $.html($(item).find('.tgme_widget_message_location_wrap')),
       getLinkPreview($, item, { staticProxy, index }),
-    ].filter(Boolean).join('').replace(/(url\(["'])((https?:)?\/\/)/g, (match, p1, p2, _p3) => {
-      if (p2 === '//') {
-        p2 = 'https://'
-      }
-      if (p2?.startsWith('t.me')) {
-        return false
-      }
-      return `${p1}${staticProxy}${p2}`
-    }),
+    ]
+      .filter(Boolean)
+      .join('')
+      .replace(/(url\(["'])(https?:\/\/|\/\/)/g, (_match, prefix, protocol) => {
+        let normalizedProtocol = protocol
+        if (normalizedProtocol === '//') {
+          normalizedProtocol = 'https://'
+        }
+        return `${prefix}${staticProxy}${normalizedProtocol}`
+      }),
     reactions: reactionsEnabled ? getReactions($, item, staticProxy) : [],
   }
 }
@@ -284,6 +303,12 @@ export async function getChannelInfo(Astro, { before = '', after = '', q = '', t
     return JSON.parse(JSON.stringify(cachedResult))
   }
 
+  if (!channel) {
+    const emptyChannel = id ? { id, filtered: true } : createEmptyChannelInfo()
+    cache.set(cacheKey, emptyChannel)
+    return JSON.parse(JSON.stringify(emptyChannel))
+  }
+
   // Where t.me can also be telegram.me, telegram.dog
   const host = getEnv(import.meta.env, Astro, 'TELEGRAM_HOST') ?? 't.me'
   const staticProxy = getEnv(import.meta.env, Astro, 'STATIC_PROXY') ?? '/static/'
@@ -298,17 +323,26 @@ export async function getChannelInfo(Astro, { before = '', after = '', q = '', t
     }
   })
 
-  console.info('Fetching', url, { before, after, q, type, id })
-  const html = await $fetch(url, {
-    headers,
-    query: {
-      before: before || undefined,
-      after: after || undefined,
-      q: q || undefined,
-    },
-    retry: 3,
-    retryDelay: 100,
-  })
+  let html = ''
+  try {
+    console.info('Fetching', url, { before, after, q, type, id })
+    html = await $fetch(url, {
+      headers,
+      query: {
+        before: before || undefined,
+        after: after || undefined,
+        q: q || undefined,
+      },
+      retry: 3,
+      retryDelay: 100,
+    })
+  }
+  catch (error) {
+    console.error('Fetch channel failed', { channel, before, after, q, type, id, error })
+    const fallback = id ? { id, filtered: true } : createEmptyChannelInfo(channel)
+    cache.set(cacheKey, fallback)
+    return JSON.parse(JSON.stringify(fallback))
+  }
 
   const $ = cheerio.load(html, {}, false)
   if (id) {
@@ -325,7 +359,9 @@ export async function getChannelInfo(Astro, { before = '', after = '', q = '', t
     $('.tgme_channel_history  .tgme_widget_message_wrap')?.map((index, item) => {
       return getPost($, item, { channel, staticProxy, index, reactionsEnabled })
     })?.get() ?? [],
-  ))?.reverse().filter(post => ['text'].includes(post.type) && post.id && post.content)
+  ))
+    ?.reverse()
+    .filter(post => post.type === 'text' && post.id && post.content)
     .filter(post => !isPostFiltered(post, filterKeywords))
 
   const channelInfo = {

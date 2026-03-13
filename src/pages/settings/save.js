@@ -1,6 +1,9 @@
 import { serializeCookie } from '../../lib/cookies'
+import { getEnv } from '../../lib/env'
+import { findListValue, parseList, uniqueList } from '../../lib/settings'
 
-export async function POST({ request }) {
+export async function POST(context) {
+  const { request } = context
   const formData = await request.formData()
   const hasChannel = formData.has('channel')
   const hasChannels = formData.has('channels')
@@ -15,34 +18,40 @@ export async function POST({ request }) {
   const maxAge = 60 * 60 * 24 * 30
 
   const headers = new Headers()
+  const lockedChannel = (getEnv(import.meta.env, context, 'CHANNEL') || '').trim()
+  const lockedChannels = uniqueList(parseList((getEnv(import.meta.env, context, 'CHANNELS') || '').trim()))
+  const lockedKeywords = (getEnv(import.meta.env, context, 'FILTER_KEYWORDS') || '').trim()
 
-  if (hasChannel || hasChannels) {
-    const list = channelsRaw
-      .split(/[\n,;]+/g)
-      .map((value) => value.trim())
-      .filter(Boolean)
+  if (hasChannels && !lockedChannels.length) {
+    const list = uniqueList(parseList(channelsRaw))
+    const preferredChannel = channelRaw && !lockedChannel ? channelRaw : ''
 
-    let channel = channelRaw
-    if (!channel && list.length > 0) {
-      channel = list[0]
-    }
-    if (channel && !list.some((item) => item.toLowerCase() === channel.toLowerCase())) {
-      list.unshift(channel)
+    if (preferredChannel && !findListValue(list, preferredChannel)) {
+      list.unshift(preferredChannel)
     }
 
     const channels = list.join(',')
-
-    headers.append('Set-Cookie', serializeCookie('bc_channel', channel, {
-      maxAge: channel ? maxAge : 0,
-      secure: isSecure,
-    }))
     headers.append('Set-Cookie', serializeCookie('bc_channels', channels, {
       maxAge: channels ? maxAge : 0,
       secure: isSecure,
     }))
   }
 
-  if (hasKeywords) {
+  if (hasChannel && !lockedChannel) {
+    const allowedList = lockedChannels.length > 0 ? lockedChannels : uniqueList(parseList(channelsRaw))
+    let channel = channelRaw
+
+    if (allowedList.length > 0) {
+      channel = findListValue(allowedList, channelRaw) || allowedList[0]
+    }
+
+    headers.append('Set-Cookie', serializeCookie('bc_channel', channel, {
+      maxAge: channel ? maxAge : 0,
+      secure: isSecure,
+    }))
+  }
+
+  if (hasKeywords && !lockedKeywords) {
     headers.append('Set-Cookie', serializeCookie('bc_filter_keywords', keywords, {
       maxAge: keywords ? maxAge : 0,
       secure: isSecure,

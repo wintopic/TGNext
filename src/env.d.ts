@@ -7,3 +7,6 @@ declare namespace App {
     RSS_PREFIX: string
   }
 }
+
+declare module 'postcss-nesting'
+declare module 'sanitize-html'

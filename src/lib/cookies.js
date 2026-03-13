@@ -1,3 +1,12 @@
+function safeDecodeURIComponent(value = '') {
+  try {
+    return decodeURIComponent(value)
+  }
+  catch {
+    return value
+  }
+}
+
 export function parseCookies(header = '') {
   if (!header)
     return {}
@@ -7,7 +16,7 @@ export function parseCookies(header = '') {
     if (!name)
       return cookies
 
-    cookies[name] = decodeURIComponent(rest.join('=') || '')
+    cookies[name] = safeDecodeURIComponent(rest.join('=') || '')
     return cookies
   }, {})
 }

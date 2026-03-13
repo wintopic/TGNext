@@ -21,18 +21,19 @@ mark {
 
 #back-to-top {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 40px;
-  height: 40px;
+  bottom: 22px;
+  right: 22px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--chip-radius);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface);
-  border: var(--panel-border-width) var(--panel-border-style) var(--border);
-  box-shadow: var(--panel-shadow);
+  background: var(--glass-bg);
+  border: var(--panel-border-width) var(--panel-border-style) color-mix(in srgb, var(--glass-border) 86%, transparent);
+  box-shadow: var(--glass-shadow), var(--glass-shadow-inset);
   background-image: var(--surface-texture);
+  backdrop-filter: blur(24px) saturate(1.6);
   opacity: 0;
   pointer-events: none;
   transition:
@@ -51,7 +52,7 @@ html[data-tabbar='true'] #back-to-top {
 }
 
 #back-to-top:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.03);
 }
 
 @supports (animation-timeline: view()) {

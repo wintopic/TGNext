@@ -6,6 +6,7 @@ import { SEO } from 'astro-seo'
 import { getEnv } from '../lib/env'
 import { getUiLabels } from '../lib/i18n'
 import { getChannelOptions, getChannelSetting } from '../lib/settings'
+import type { LinkItem } from '../lib/types'
 import backToTopIcon from '../assets/back-to-top.svg'
 
 const { SITE_URL, RSS_URL, RSS_PREFIX } = Astro.locals
@@ -73,35 +74,45 @@ const FOOTER_INJECT = getEnv(import.meta.env, Astro, 'FOOTER_INJECT')
 const TAGS = getEnv(import.meta.env, Astro, 'TAGS')
 const LINKS = getEnv(import.meta.env, Astro, 'LINKS')
 
-const tags = (TAGS || '')
+const tags: string[] = (TAGS || '')
   .split(',')
-  .map((tag) => tag.trim())
+  .map((tag: string) => tag.trim())
   .filter(Boolean)
 
-const links = (LINKS || '')
+const links: LinkItem[] = (LINKS || '')
   .split(';')
   .filter(Boolean)
-  .map((link) => {
-    link = link.split(',')
+  .map((link: string) => {
+    const parts = link.split(',').map((part: string) => part.trim())
     return {
-      title: link[0],
-      href: link[1],
+      title: parts[0],
+      href: parts[1],
     }
   })
+  .filter((link: LinkItem) => link.title && link.href)
 
-const navs = (getEnv(import.meta.env, Astro, 'NAVS') || '')
+const navs: LinkItem[] = (getEnv(import.meta.env, Astro, 'NAVS') || '')
   .split(';')
   .filter(Boolean)
-  .map((link) => {
-    link = link.split(',')
+  .map((link: string) => {
+    const parts = link.split(',').map((part: string) => part.trim())
     return {
-      title: link[0],
-      href: link[1],
+      title: parts[0],
+      href: parts[1],
     }
   })
+  .filter((link: LinkItem) => link.title && link.href)
+
+function safeDecodeURIComponent(value = '') {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
+}
 
 const searchQuery = Astro.url.searchParams.get('q') || ''
-const pathQuery = Astro.params?.q ? decodeURIComponent(Astro.params.q) : ''
+const pathQuery = Astro.params?.q ? safeDecodeURIComponent(Astro.params.q) : ''
 const currentQuery = searchQuery || pathQuery
 const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '') : ''
 ---
@@ -158,7 +169,10 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
         <div class="topbar-content">
           <div class="topbar-brand">
             <a class="brand" href={SITE_URL} title="TGNext">TGNext</a>
-            <div class="brand-subtitle">{channel?.title}</div>
+            <div class="topbar-meta">
+              {currentChannel && <span class="topbar-channel">@{currentChannel}</span>}
+              <div class="brand-subtitle">{channel?.title || '多频道订阅流'}</div>
+            </div>
           </div>
 
           <nav class="topbar-nav" aria-label="主导航">
@@ -227,7 +241,7 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
                 type="text"
                 name="q"
                 placeholder={labels.searchPlaceholder}
-                defaultValue={currentQuery}
+                value={currentQuery}
               />
               <button type="submit" class="icon-button search-submit" aria-label={labels.search}>
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -259,35 +273,41 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
       <main class="main">
         <slot name="header" />
 
-        {(tags.length > 0 || links.length > 0) && (
-          <div class="meta-panel">
-            {tags.length > 0 && (
-              <div class="meta-section">
-                <div class="block-title">{labels.tags}</div>
-                <div class="tag-list">
-                  {tags.map((tag) => (
-                    <a href={`/search/%23${tag}`} class={`tag-chip ${currentTag === tag ? 'active' : ''}`} title={tag}>
-                      #{tag}
-                    </a>
-                  ))}
+        {
+          (tags.length > 0 || links.length > 0) && (
+            <div class="meta-panel">
+              {tags.length > 0 && (
+                <div class="meta-section">
+                  <div class="block-title">{labels.tags}</div>
+                  <div class="tag-list">
+                    {tags.map((tag) => (
+                      <a
+                        href={`/search/%23${tag}`}
+                        class={`tag-chip ${currentTag === tag ? 'active' : ''}`}
+                        title={tag}
+                      >
+                        #{tag}
+                      </a>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {links.length > 0 && (
-              <div class="meta-section">
-                <div class="block-title">{labels.links}</div>
-                <div class="link-list">
-                  {links.map((link) => (
-                    <a href={link.href} class="link-chip" target="_blank" rel="noopener" title={link.title}>
-                      {link.title}
-                    </a>
-                  ))}
+              {links.length > 0 && (
+                <div class="meta-section">
+                  <div class="block-title">{labels.links}</div>
+                  <div class="link-list">
+                    {links.map((link) => (
+                      <a href={link.href} class="link-chip" target="_blank" rel="noopener" title={link.title}>
+                        {link.title}
+                      </a>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )
+        }
 
         <slot />
       </main>
@@ -326,7 +346,7 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
                         stroke-width="1.6"
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                      ></path>
+                      />
                     </svg>
                   </span>
                   <span class="tabbar-label">{labels.more}</span>
@@ -350,7 +370,12 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
                   </button>
                 ))}
               </form>
-              <button class="tabbar-popover-close" type="button" popovertarget="channel-more" popovertargetaction="hide">
+              <button
+                class="tabbar-popover-close"
+                type="button"
+                popovertarget="channel-more"
+                popovertargetaction="hide"
+              >
                 {labels.close}
               </button>
             </div>
@@ -371,6 +396,7 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
         const layoutButtons = document.querySelectorAll('[data-layout-value]')
         const searchForm = document.querySelector('[data-search-form]')
         const searchInput = document.querySelector('#search-input')
+        const searchTrigger = searchForm?.querySelector('.search-trigger')
         const media = window.matchMedia('(prefers-color-scheme: dark)')
         const mobileQuery = window.matchMedia('(max-width: 560px)')
 
@@ -407,10 +433,23 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
           updateButtons()
         }
 
-        function updateSearchMode() {
-          if (!searchForm)
+        function hasSearchValue() {
+          return Boolean(searchInput?.value?.trim())
+        }
+
+        function setSearchCollapsed(collapsed) {
+          if (!searchForm) {
             return
-          searchForm.dataset.collapsed = mobileQuery.matches ? 'true' : 'false'
+          }
+          searchForm.dataset.collapsed = collapsed ? 'true' : 'false'
+        }
+
+        function updateSearchMode() {
+          if (!searchForm) {
+            return
+          }
+          const shouldCollapse = mobileQuery.matches && !hasSearchValue() && !searchForm.matches(':focus-within')
+          setSearchCollapsed(shouldCollapse)
         }
 
         document.addEventListener('click', (event) => {
@@ -439,25 +478,46 @@ const currentTag = currentQuery?.startsWith('#') ? currentQuery.replace('#', '')
 
         if (searchForm) {
           searchForm.addEventListener('click', (event) => {
-            if (searchForm.dataset.collapsed !== 'true')
+            if (searchForm.dataset.collapsed !== 'true') {
               return
+            }
             const trigger = event.target.closest('.search-trigger')
-            if (!trigger)
+            if (!trigger) {
               return
+            }
             event.preventDefault()
             event.stopPropagation()
-            searchForm.dataset.collapsed = 'false'
+            setSearchCollapsed(false)
             requestAnimationFrame(() => {
               searchInput?.focus()
             })
           })
 
+          searchInput?.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && mobileQuery.matches && !hasSearchValue()) {
+              setSearchCollapsed(true)
+              searchTrigger?.focus()
+            }
+          })
+
+          searchInput?.addEventListener('blur', () => {
+            requestAnimationFrame(updateSearchMode)
+          })
+
+          searchInput?.addEventListener('input', () => {
+            if (hasSearchValue()) {
+              setSearchCollapsed(false)
+            }
+          })
+
           document.addEventListener('click', (event) => {
-            if (searchForm.dataset.collapsed === 'true')
+            if (searchForm.dataset.collapsed === 'true') {
               return
-            if (searchForm.contains(event.target))
+            }
+            if (searchForm.contains(event.target)) {
               return
-            searchForm.dataset.collapsed = mobileQuery.matches ? 'true' : 'false'
+            }
+            updateSearchMode()
           })
         }
 

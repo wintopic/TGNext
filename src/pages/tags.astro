@@ -12,7 +12,14 @@ channel.seo = {
   title: labels.tags,
 }
 
-const tags = (getEnv(import.meta.env, Astro, 'TAGS') || '').split(',')
+const tags = (getEnv(import.meta.env, Astro, 'TAGS') || '')
+  .split(',')
+  .map((tag: string) => tag.trim())
+  .filter(Boolean)
+
+if (!tags.length) {
+  return Astro.redirect('/')
+}
 ---
 
 <Layout channel={channel} id="main-container">

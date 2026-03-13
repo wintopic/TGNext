@@ -1,6 +1,6 @@
 export function parseKeywords(raw = '') {
   return raw
-    .split(/[\n,;]+/g)
+    .split(/[\n,;]+/)
     .map(value => value.trim())
     .filter(Boolean)
 }

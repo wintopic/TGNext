@@ -1,8 +1,17 @@
 ---
 import List from '../../components/list.astro'
+import SearchHighlight from '../../components/search-highlight.astro'
 import { getChannelInfo } from '../../lib/telegram'
 
-const q = Astro.url.searchParams.get('q') || decodeURIComponent(Astro.params.q || '')
+function safeDecodeURIComponent(value = '') {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
+}
+
+const q = Astro.url.searchParams.get('q') || safeDecodeURIComponent(Astro.params.q || '')
 const channel = await getChannelInfo(Astro, {
   q,
 })
@@ -14,52 +23,4 @@ channel.seo = {
 ---
 
 <List channel={channel} before={false} after={false} query={q} />
-
-{
-  q && (
-    <script is:inline define:vars={{ termRaw: q }}>
-      (() => {
-        const term = (termRaw || '').trim().replace(/^#/, '')
-        if (!term)
-          return
-        const root = document.querySelector('.items')
-        if (!root)
-          return
-        const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-        const regex = new RegExp(escapeRegExp(term), 'gi')
-        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-          acceptNode(node) {
-            if (!node.parentElement)
-              return NodeFilter.FILTER_REJECT
-            const tag = node.parentElement.tagName
-            if (['SCRIPT', 'STYLE', 'MARK'].includes(tag))
-              return NodeFilter.FILTER_REJECT
-            return node.nodeValue && regex.test(node.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
-          },
-        })
-        const nodes = []
-        while (walker.nextNode())
-          nodes.push(walker.currentNode)
-        nodes.forEach((node) => {
-          const fragment = document.createDocumentFragment()
-          const text = node.nodeValue
-          let lastIndex = 0
-          text.replace(regex, (match, offset) => {
-            if (offset > lastIndex) {
-              fragment.appendChild(document.createTextNode(text.slice(lastIndex, offset)))
-            }
-            const mark = document.createElement('mark')
-            mark.textContent = match
-            fragment.appendChild(mark)
-            lastIndex = offset + match.length
-            return match
-          })
-          if (lastIndex < text.length) {
-            fragment.appendChild(document.createTextNode(text.slice(lastIndex)))
-          }
-          node.parentNode.replaceChild(fragment, node)
-        })
-      })()
-    </script>
-  )
-}
+<SearchHighlight term={q} />

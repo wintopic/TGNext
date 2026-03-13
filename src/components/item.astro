@@ -4,11 +4,12 @@ import 'prismjs/themes/prism.css'
 import dayjs from '../lib/dayjs'
 import { getEnv } from '../lib/env'
 import { getChannelSetting } from '../lib/settings'
+import type { ChannelPost } from '../lib/types'
 
 const timezone = getEnv(import.meta.env, Astro, 'TIMEZONE')
 
 const { SITE_URL } = Astro.locals
-const { post, isItem } = Astro.props
+const { post, isItem = false } = Astro.props as { isItem?: boolean; post: ChannelPost }
 
 const channelSetting = getChannelSetting(Astro)
 const channel = channelSetting.value
@@ -36,13 +37,13 @@ const timeago = datetime.isBefore(dayjs().subtract(1, 'w')) ? datetime.format('H
           {post.reactions.map((reaction) => (
             <span class={`reaction-pill${reaction.isPaid ? ' reaction-pill-paid' : ''}`}>
               <span class="reaction-emoji">
-                {
-                  reaction.isPaid
-                    ? '\u2B50'
-                    : reaction.emojiImage
-                      ? <img src={reaction.emojiImage} alt={reaction.emoji || 'emoji'} loading="lazy" />
-                      : reaction.emoji
-                }
+                {reaction.isPaid ? (
+                  '\u2B50'
+                ) : reaction.emojiImage ? (
+                  <img src={reaction.emojiImage} alt={reaction.emoji || 'emoji'} loading="lazy" />
+                ) : (
+                  reaction.emoji
+                )}
               </span>
               <span class="reaction-count">{reaction.count}</span>
             </span>

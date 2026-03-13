@@ -1,4 +1,4 @@
-export function getUiLabels(Astro) {
+export function getUiLabels(_Astro) {
   return {
     home: '首页',
     tags: '标签',

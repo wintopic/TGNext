@@ -8,9 +8,12 @@ import discord from '../assets/discord.svg'
 import telegram from '../assets/telegram.svg'
 import mastodon from '../assets/mastodon.svg'
 import bluesky from '../assets/bluesky.svg'
+import { getChannelSetting } from '../lib/settings'
 
 const { SITE_URL } = Astro.locals
 const { channel } = Astro.props
+const channelSetting = getChannelSetting(Astro)
+const channelHandle = channelSetting.value
 
 const PODCAST = getEnv(import.meta.env, Astro, 'PODCAST') ?? getEnv(import.meta.env, Astro, 'PODCASRT')
 const TWITTER = getEnv(import.meta.env, Astro, 'TWITTER')
@@ -34,14 +37,19 @@ const hideDescription = getEnv(import.meta.env, Astro, 'HIDE_DESCRIPTION')
       />
     </a>
     <div class="profile-info">
+      <div class="profile-meta-line">
+        <span class="profile-badge">TGNext</span>
+        {channelHandle && <span class="profile-handle">@{channelHandle}</span>}
+      </div>
       <div class="profile-title-row">
         <a href={SITE_URL} class="profile-title" title={channel?.title}>
           {channel?.title}
         </a>
-        <span class="profile-badge">TGNext</span>
+        <span class="profile-dot" aria-hidden="true"></span>
+        <span class="profile-status">实时同步</span>
       </div>
+      <div class="profile-subtitle">Telegram 频道聚合 · Cloudflare Pages 部署</div>
       <div class="profile-actions">
-
         {
           PODCAST && (
             <a href={PODCAST} target="_blank" title="播客" class="icon-button">

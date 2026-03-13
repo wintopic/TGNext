@@ -1,5 +1,5 @@
-import { getEnv } from './env'
 import { parseCookies } from './cookies'
+import { getEnv } from './env'
 
 function normalizeValue(value) {
   if (typeof value !== 'string')
@@ -8,14 +8,22 @@ function normalizeValue(value) {
   return trimmed.length > 0 ? trimmed : ''
 }
 
-function parseList(raw = '') {
+export function findListValue(values = [], target = '') {
+  const normalizedTarget = normalizeValue(target).toLowerCase()
+  if (!normalizedTarget)
+    return ''
+
+  return values.find(value => value.toLowerCase() === normalizedTarget) || ''
+}
+
+export function parseList(raw = '') {
   return raw
-    .split(/[\n,;]+/g)
-    .map((value) => value.trim())
+    .split(/[\n,;]+/)
+    .map(value => value.trim())
     .filter(Boolean)
 }
 
-function uniqueList(values = []) {
+export function uniqueList(values = []) {
   const seen = new Set()
   const result = []
   values.forEach((value) => {
@@ -53,13 +61,25 @@ export function getConfigValue(Astro, envName, cookieName) {
 }
 
 export function getChannelSetting(Astro) {
+  const channelsSetting = getChannelsSetting(Astro)
+  const list = uniqueList(parseList(channelsSetting.value))
   const setting = getConfigValue(Astro, 'CHANNEL', 'bc_channel')
+
   if (setting.value) {
+    if (channelsSetting.source === 'env' && setting.source !== 'env') {
+      const matched = findListValue(list, setting.value)
+      if (matched) {
+        return { value: matched, source: setting.source }
+      }
+
+      if (list.length > 0) {
+        return { value: list[0], source: 'default' }
+      }
+    }
+
     return setting
   }
 
-  const channelsSetting = getChannelsSetting(Astro)
-  const list = parseList(channelsSetting.value)
   if (list.length > 0) {
     return { value: list[0], source: 'default' }
   }
@@ -78,8 +98,24 @@ export function getChannelsSetting(Astro) {
 export function getChannelOptions(Astro) {
   const channelSetting = getChannelSetting(Astro)
   const channelsSetting = getChannelsSetting(Astro)
+  const list = uniqueList(parseList(channelsSetting.value))
+
+  if (channelsSetting.source === 'env' && list.length > 0) {
+    const current = channelSetting.source === 'env'
+      ? channelSetting.value
+      : findListValue(list, channelSetting.value) || list[0]
+    const resolvedList = channelSetting.source === 'env'
+      ? uniqueList([channelSetting.value, ...list].filter(Boolean))
+      : list
+
+    return {
+      current,
+      list: resolvedList,
+      source: channelsSetting.source,
+    }
+  }
+
   const current = channelSetting.value
-  const list = parseList(channelsSetting.value)
   const merged = uniqueList([current, ...list].filter(Boolean))
 
   return {
