@@ -35,6 +35,7 @@ const hasSearchContext = query !== null && query !== undefined
 const searchQuery = typeof query === 'string' ? query.trim() : ''
 const isTagQuery = searchQuery.startsWith('#')
 const displayQuery = isTagQuery ? searchQuery.replace(/^#/, '') : searchQuery
+const showFeedIntro = !isItem && !hasSearchContext && posts.length > 0
 const resolvedEmptyTitle =
   emptyTitle ??
   (hasSearchContext && searchQuery ? labels.searchEmpty : hasSearchContext ? labels.search : labels.noPosts)
@@ -73,10 +74,24 @@ const resolvedEmptyHint = emptyHint ?? (hasSearchContext && !searchQuery ? label
   }
 
   {
+    showFeedIntro && (
+      <section class="feed-intro glass-panel">
+        <div class="feed-intro-kicker">{labels.feedTitle}</div>
+        <div class="feed-intro-title">{channel?.title || labels.feedTitle}</div>
+        <div class="feed-intro-text">{labels.feedHint}</div>
+        <div class="feed-intro-meta">
+          <span>{channel?.title || '当前频道'}</span>
+          <span>{posts.length} 条内容</span>
+        </div>
+      </section>
+    )
+  }
+
+  {
     posts.length > 0 ? (
-      <div class="items">
-        {posts.map((post) => (
-          <Item post={post} isItem={isItem} />
+      <div class={`items ${isItem ? 'items-detail' : 'items-feed'}`}>
+        {posts.map((post, index) => (
+          <Item post={post} isItem={isItem} featured={!isItem && index === 0 && !hasSearchContext} />
         ))}
       </div>
     ) : (

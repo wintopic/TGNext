@@ -3,81 +3,194 @@ import '../assets/item.css'
 import 'prismjs/themes/prism.css'
 import dayjs from '../lib/dayjs'
 import { getEnv } from '../lib/env'
+import { getUiLabels } from '../lib/i18n'
 import { getChannelSetting } from '../lib/settings'
 import type { ChannelPost } from '../lib/types'
 
 const timezone = getEnv(import.meta.env, Astro, 'TIMEZONE')
 
 const { SITE_URL } = Astro.locals
-const { post, isItem = false } = Astro.props as { isItem?: boolean; post: ChannelPost }
+const {
+  post,
+  isItem = false,
+  featured = false,
+} = Astro.props as {
+  featured?: boolean
+  isItem?: boolean
+  post: ChannelPost
+}
 
 const channelSetting = getChannelSetting(Astro)
 const channel = channelSetting.value
 const COMMENTS = getEnv(import.meta.env, Astro, 'COMMENTS')
 const REACTIONS = getEnv(import.meta.env, Astro, 'REACTIONS')
+const labels = getUiLabels(Astro)
 
 const datetime = dayjs(post.datetime).tz(timezone)
 const timeago = datetime.isBefore(dayjs().subtract(1, 'w')) ? datetime.format('HH:mm · ll · ddd') : datetime.fromNow()
+const publishDate = datetime.format('YYYY.MM.DD')
+const postUrl = `${SITE_URL}posts/${post.id}`
+const plainText = (post.text || '').replace(/\s+/g, ' ').trim()
+const normalizedTitle = (post.title || '').replace(/\s+/g, ' ').trim()
+const fallbackTitle = plainText.slice(0, 46)
+const displayTitle = normalizedTitle || fallbackTitle || '未命名内容'
+const excerptSource = plainText.startsWith(displayTitle) ? plainText.slice(displayTitle.length).trim() : plainText
+const excerpt = excerptSource.length > 220 ? `${excerptSource.slice(0, 220).trim()}…` : excerptSource
+const readingMinutes = Math.max(1, Math.round((plainText || displayTitle).length / 320))
+const visibleTags = post.tags.slice(0, 4)
+const remainingTags = Math.max(post.tags.length - visibleTags.length, 0)
+const itemClass = ['item', isItem ? 'item-detail' : 'item-feed', featured ? 'item-featured' : '']
+  .filter(Boolean)
+  .join(' ')
+
+function extractCoverImage(html = '') {
+  const imageRegex = /<img\b([^>]*)src="([^"]+)"[^>]*>/gi
+
+  for (const match of html.matchAll(imageRegex)) {
+    const attrs = match[1] || ''
+    const src = match[2] || ''
+    if (!src || /tg-emoji|sticker|modal-img/i.test(attrs)) {
+      continue
+    }
+    return src
+  }
+
+  return ''
+}
+
+const coverImage = !isItem ? extractCoverImage(post.content) : ''
 ---
 
-<div class="item" style={{ 'view-transition-name': `post-${post.id}` }}>
-  <div class="time-box">
-    <div class="dot"></div>
-    <div class="time">
-      <a href={`${SITE_URL}posts/${post.id}`} title={post.datetime} class="item-link">
-        <time datetime={post.datetime} title={timeago}>{timeago}</time>
-      </a>
+<article class={itemClass} style={{ 'view-transition-name': `post-${post.id}` }}>
+  <div class="item-surface">
+    {
+      !isItem && coverImage && (
+        <a href={postUrl} class="item-cover" title={displayTitle}>
+          <img src={coverImage} alt={displayTitle} loading={featured ? 'eager' : 'lazy'} />
+        </a>
+      )
+    }
+
+    <div class="item-body">
+      <header class="item-header">
+        <div class="time-box">
+          <div class="dot"></div>
+          <div class="time">
+            <a href={postUrl} title={post.datetime} class="item-link">
+              <time datetime={post.datetime} title={timeago}>{publishDate}</time>
+            </a>
+          </div>
+          <span class="item-time-separator">·</span>
+          <span class="item-relative-time">{timeago}</span>
+        </div>
+        {
+          !isItem && (
+            <div class="item-meta-pills">
+              {featured && <span class="item-pill item-pill-accent">{labels.featured}</span>}
+              <span class="item-pill">
+                {readingMinutes} {labels.readingMinutes}
+              </span>
+            </div>
+          )
+        }
+      </header>
+
+      {
+        isItem ? (
+          <>
+            <div class="item-copy">
+              <h1 class="item-title item-title-detail">{displayTitle}</h1>
+              {excerpt && <p class="item-dek">{excerpt}</p>}
+            </div>
+            {post.content.length > 0 && <div class="text-box content" set:html={post.content} />}
+          </>
+        ) : (
+          <>
+            <div class="item-copy">
+              <h2 class={`item-title ${featured ? 'item-title-featured' : ''}`}>
+                <a href={postUrl} class="item-title-link" title={displayTitle}>
+                  {displayTitle}
+                </a>
+              </h2>
+              {excerpt && <p class="item-excerpt">{excerpt}</p>}
+            </div>
+          </>
+        )
+      }
+
+      {
+        REACTIONS && post.reactions?.length > 0 && (
+          <div class="reaction-box">
+            <div class="reaction-list">
+              {post.reactions.map((reaction) => (
+                <span class={`reaction-pill${reaction.isPaid ? ' reaction-pill-paid' : ''}`}>
+                  <span class="reaction-emoji">
+                    {reaction.isPaid ? (
+                      '\u2B50'
+                    ) : reaction.emojiImage ? (
+                      <img src={reaction.emojiImage} alt={reaction.emoji || 'emoji'} loading="lazy" />
+                    ) : (
+                      reaction.emoji
+                    )}
+                  </span>
+                  <span class="reaction-count">{reaction.count}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )
+      }
+
+      {
+        !isItem && (
+          <footer class="item-footer">
+            {visibleTags.length > 0 ? (
+              <div class="tag-box item-tag-box">
+                {visibleTags.map((tag) => (
+                  <a href={`/search/%23${tag}`} title={tag} class="tag">
+                    {tag}
+                  </a>
+                ))}
+                {remainingTags > 0 && <span class="tag tag-more">+{remainingTags}</span>}
+              </div>
+            ) : (
+              <div class="item-footer-spacer" />
+            )}
+            <a href={postUrl} class="item-cta" title={displayTitle}>
+              {labels.readMore}
+            </a>
+          </footer>
+        )
+      }
+
+      {
+        isItem && post.tags.length > 0 && (
+          <div class="tag-box" style={post.content.length === 0 ? 'padding-top: 30px;' : ''}>
+            <div class="tag-icon" />
+            {post.tags.map((tag) => (
+              <a href={`/search/%23${tag}`} title={tag} class="tag">
+                {tag}
+              </a>
+            ))}
+          </div>
+        )
+      }
+
+      {
+        COMMENTS && isItem && (
+          <div class="comments">
+            <script
+              is:inline
+              async
+              src="https://telegram.org/js/telegram-widget.js"
+              data-telegram-discussion={`${channel}/${post.id}`}
+              data-comments-limit="50"
+              data-colorful="1"
+              data-color="454545"
+            />
+          </div>
+        )
+      }
     </div>
   </div>
-  {post.content.length > 0 && <div class={`text-box content`} set:html={post.content} />}
-  {
-    REACTIONS && post.reactions?.length > 0 && (
-      <div class="reaction-box">
-        <div class="reaction-list">
-          {post.reactions.map((reaction) => (
-            <span class={`reaction-pill${reaction.isPaid ? ' reaction-pill-paid' : ''}`}>
-              <span class="reaction-emoji">
-                {reaction.isPaid ? (
-                  '\u2B50'
-                ) : reaction.emojiImage ? (
-                  <img src={reaction.emojiImage} alt={reaction.emoji || 'emoji'} loading="lazy" />
-                ) : (
-                  reaction.emoji
-                )}
-              </span>
-              <span class="reaction-count">{reaction.count}</span>
-            </span>
-          ))}
-        </div>
-      </div>
-    )
-  }
-  {
-    post.tags.length > 0 && (
-      <div class="tag-box" style={post.content.length === 0 ? 'padding-top: 30px;' : ''}>
-        <div class="tag-icon" />
-        {post.tags.map((tag) => (
-          <a href={`/search/%23${tag}`} title={tag} class="tag">
-            {tag}
-          </a>
-        ))}
-      </div>
-    )
-  }
-
-  {
-    COMMENTS && isItem && (
-      <div class="comments">
-        <script
-          is:inline
-          async
-          src="https://telegram.org/js/telegram-widget.js"
-          data-telegram-discussion={`${channel}/${post.id}`}
-          data-comments-limit="50"
-          data-colorful="1"
-          data-color="454545"
-        />
-      </div>
-    )
-  }
-</div>
+</article>
