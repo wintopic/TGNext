@@ -34,33 +34,16 @@ const plainText = normalizeText(post.text || '')
 const normalizedTitle = normalizeText(post.title || '')
 const titleLength = isItem ? 64 : featured ? 50 : 36
 const displayTitle = resolveDisplayTitle(normalizedTitle, plainText, titleLength) || '未命名内容'
-const excerptSource = plainText.startsWith(stripTrailingEllipsis(displayTitle))
+const detailDekSource = plainText.startsWith(stripTrailingEllipsis(displayTitle))
   ? plainText.slice(stripTrailingEllipsis(displayTitle).length).trim()
   : plainText
-const excerpt = excerptSource.length > 220 ? `${excerptSource.slice(0, 220).trim()}…` : excerptSource
+const detailDek = detailDekSource.length > 220 ? `${detailDekSource.slice(0, 220).trim()}…` : detailDekSource
 const readingMinutes = Math.max(1, Math.round((plainText || displayTitle).length / 320))
 const visibleTags = post.tags.slice(0, 4)
 const remainingTags = Math.max(post.tags.length - visibleTags.length, 0)
 const itemClass = ['item', isItem ? 'item-detail' : 'item-feed', featured ? 'item-featured' : '']
   .filter(Boolean)
   .join(' ')
-
-function extractCoverImage(html = '') {
-  const imageRegex = /<img\b([^>]*)src="([^"]+)"[^>]*>/gi
-
-  for (const match of html.matchAll(imageRegex)) {
-    const attrs = match[1] || ''
-    const src = match[2] || ''
-    if (!src || /tg-emoji|sticker|modal-img/i.test(attrs)) {
-      continue
-    }
-    return src
-  }
-
-  return ''
-}
-
-const coverImage = !isItem ? extractCoverImage(post.content) : ''
 
 function normalizeText(value = '') {
   return value.replace(/\s+/g, ' ').trim()
@@ -115,14 +98,6 @@ function resolveDisplayTitle(rawTitle = '', text = '', maxLength = 36) {
 
 <article class={itemClass} style={{ 'view-transition-name': `post-${post.id}` }}>
   <div class="item-surface">
-    {
-      !isItem && coverImage && (
-        <a href={postUrl} class="item-cover" title={displayTitle}>
-          <img src={coverImage} alt={displayTitle} loading={featured ? 'eager' : 'lazy'} />
-        </a>
-      )
-    }
-
     <div class="item-body">
       <header class="item-header">
         <div class="time-box">
@@ -152,7 +127,7 @@ function resolveDisplayTitle(rawTitle = '', text = '', maxLength = 36) {
           <>
             <div class="item-copy">
               <h1 class="item-title item-title-detail">{displayTitle}</h1>
-              {excerpt && <p class="item-dek">{excerpt}</p>}
+              {detailDek && <p class="item-dek">{detailDek}</p>}
             </div>
             {post.content.length > 0 && <div class="text-box content" set:html={post.content} />}
           </>
@@ -164,8 +139,8 @@ function resolveDisplayTitle(rawTitle = '', text = '', maxLength = 36) {
                   {displayTitle}
                 </a>
               </h2>
-              {excerpt && <p class="item-excerpt">{excerpt}</p>}
             </div>
+            {post.content.length > 0 && <div class="text-box content" set:html={post.content} />}
           </>
         )
       }
