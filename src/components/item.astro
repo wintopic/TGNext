@@ -30,11 +30,13 @@ const datetime = dayjs(post.datetime).tz(timezone)
 const timeago = datetime.isBefore(dayjs().subtract(1, 'w')) ? datetime.format('HH:mm · ll · ddd') : datetime.fromNow()
 const publishDate = datetime.format('YYYY.MM.DD')
 const postUrl = `${SITE_URL}posts/${post.id}`
-const plainText = (post.text || '').replace(/\s+/g, ' ').trim()
-const normalizedTitle = (post.title || '').replace(/\s+/g, ' ').trim()
-const fallbackTitle = plainText.slice(0, 46)
-const displayTitle = normalizedTitle || fallbackTitle || '未命名内容'
-const excerptSource = plainText.startsWith(displayTitle) ? plainText.slice(displayTitle.length).trim() : plainText
+const plainText = normalizeText(post.text || '')
+const normalizedTitle = normalizeText(post.title || '')
+const titleLength = isItem ? 64 : featured ? 50 : 36
+const displayTitle = resolveDisplayTitle(normalizedTitle, plainText, titleLength) || '未命名内容'
+const excerptSource = plainText.startsWith(stripTrailingEllipsis(displayTitle))
+  ? plainText.slice(stripTrailingEllipsis(displayTitle).length).trim()
+  : plainText
 const excerpt = excerptSource.length > 220 ? `${excerptSource.slice(0, 220).trim()}…` : excerptSource
 const readingMinutes = Math.max(1, Math.round((plainText || displayTitle).length / 320))
 const visibleTags = post.tags.slice(0, 4)
@@ -59,6 +61,56 @@ function extractCoverImage(html = '') {
 }
 
 const coverImage = !isItem ? extractCoverImage(post.content) : ''
+
+function normalizeText(value = '') {
+  return value.replace(/\s+/g, ' ').trim()
+}
+
+function stripTrailingEllipsis(value = '') {
+  return value.replace(/…$/, '').trim()
+}
+
+function truncateTitle(value = '', maxLength = 36) {
+  const cleaned = normalizeText(value)
+  if (!cleaned) {
+    return ''
+  }
+
+  const punctuationIndex = cleaned.search(/[。！？!?；;\n]/)
+  const urlIndex = cleaned.search(/https?:\/\//)
+  const stopIndexes = [punctuationIndex, urlIndex].filter((index) => index >= 0)
+  const naturalEnd = stopIndexes.length > 0 ? Math.min(...stopIndexes) : cleaned.length
+  const endIndex = Math.min(naturalEnd, maxLength)
+  const title = cleaned.slice(0, endIndex).trim()
+
+  if (!title) {
+    return cleaned.slice(0, maxLength).trim()
+  }
+
+  return cleaned.length > endIndex ? `${title}…` : title
+}
+
+function resolveDisplayTitle(rawTitle = '', text = '', maxLength = 36) {
+  const derivedTitle = truncateTitle(text, maxLength)
+  if (!rawTitle) {
+    return derivedTitle
+  }
+
+  const normalizedRawTitle = normalizeText(rawTitle)
+  if (!text) {
+    return truncateTitle(normalizedRawTitle, maxLength)
+  }
+
+  const rawTitleLooksLikeFullBody =
+    normalizedRawTitle.length >= Math.max(maxLength + 12, text.length - 12) ||
+    (text.startsWith(normalizedRawTitle) && normalizedRawTitle.length > maxLength)
+
+  if (rawTitleLooksLikeFullBody) {
+    return derivedTitle || truncateTitle(normalizedRawTitle, maxLength)
+  }
+
+  return truncateTitle(normalizedRawTitle, maxLength) || derivedTitle
+}
 ---
 
 <article class={itemClass} style={{ 'view-transition-name': `post-${post.id}` }}>
@@ -142,23 +194,16 @@ const coverImage = !isItem ? extractCoverImage(post.content) : ''
       }
 
       {
-        !isItem && (
+        !isItem && visibleTags.length > 0 && (
           <footer class="item-footer">
-            {visibleTags.length > 0 ? (
-              <div class="tag-box item-tag-box">
-                {visibleTags.map((tag) => (
-                  <a href={`/search/%23${tag}`} title={tag} class="tag">
-                    {tag}
-                  </a>
-                ))}
-                {remainingTags > 0 && <span class="tag tag-more">+{remainingTags}</span>}
-              </div>
-            ) : (
-              <div class="item-footer-spacer" />
-            )}
-            <a href={postUrl} class="item-cta" title={displayTitle}>
-              {labels.readMore}
-            </a>
+            <div class="tag-box item-tag-box">
+              {visibleTags.map((tag) => (
+                <a href={`/search/%23${tag}`} title={tag} class="tag">
+                  {tag}
+                </a>
+              ))}
+              {remainingTags > 0 && <span class="tag tag-more">+{remainingTags}</span>}
+            </div>
           </footer>
         )
       }
